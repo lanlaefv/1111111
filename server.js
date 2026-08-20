@@ -77,8 +77,8 @@ app.post('/api/alipay/precreate', async (req, res) => {
     console.log('Precreate response:', JSON.stringify(response))
 
     if (response && response.code === '10000') {
-      const qrCode = response.qrCode
-      const tradeNo = response.tradeNo || ''
+      const qrCode = response.qr_code || response.qrCode || ''
+      const tradeNo = response.trade_no || response.tradeNo || ''
 
       orders.set(orderNo, {
         tradeNo,
