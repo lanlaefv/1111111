@@ -1,1 +1,276 @@
-Y29uc3QgZXhwcmVzcyA9IHJlcXVpcmUoJ2V4cHJlc3MnKQpjb25zdCBib2R5UGFyc2VyID0gcmVxdWlyZSgnYm9keS1wYXJzZXInKQpjb25zdCBjb3JzID0gcmVxdWlyZSgnY29ycycpCmNvbnN0IGh0dHBzID0gcmVxdWlyZSgnaHR0cHMnKQpjb25zdCBmcyA9IHJlcXVpcmUoJ2ZzJykKY29uc3QgcGF0aCA9IHJlcXVpcmUoJ3BhdGgnKQpjb25zdCBBbGlwYXlTZGsgPSByZXF1aXJlKCdhbGlwYXktc2RrJykuZGVmYXVsdApjb25zdCBjcnlwdG8gPSByZXF1aXJlKCdjcnlwdG8nKQoKY29uc3QgYXBwID0gZXhwcmVzcygpCmNvbnN0IFBPUlQgPSBwcm9jZXNzLmVudi5QT1JUIHx8IDMwMDAKCmFwcC51c2UoY29ycygpKQphcHAudXNlKGJvZHlQYXJzZXIudXJsZW5jb2RlZCh7IGV4dGVuZGVkOiB0cnVlIH0pKQphcHAudXNlKGJvZHlQYXJzZXIuanNvbigpKQoKY29uc3QgYWxpcGF5U2RrID0gbmV3IEFsaXBheVNkayh7CiAgYXBwSWQ6IHByb2Nlc3MuZW52LkFMSVBBWV9BUFBfSUQgfHwgJzkwMjEwMDAxNjY2NjU3MzEnLAogIHByaXZhdGVLZXk6IHByb2Nlc3MuZW52LkFMSVBBWV9QUklWQVRFX0tFWSB8fCAnTUlJRXZRSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2N3Z2dTakFnRUFBb0lCQVFEUTU2aUtNQ0pmajNZblpydzZXVmZMci9EUnFhZ0dRWkFUYzN6ZXVJMFRJYUJvS09jb0FpVEova1dnd0V4OUVFcVcvZmt6UmZ0Qi9vY3Fldm4zT2tHeUZQV084REFKK3BoNWFBQVBXZ3UvYUZxRGYwbGFyclZmSkFGM2x5R0N1ZFlCSE5YUFZwMmxFRlJ0bmFFV3l5c3FjUzZOdWlhTDZrMDFLc1BEc0dVWmd5U2xPdXFBQUtGV2hQdkpEUjlJekY1V0FPQ1ptTGxhRWdmNUNEbW1YK1d3UU1OeDBLbkljTUlFS2VEMFpzU2xXaitTTFNON041aFI4OVkxRURGd1FMRHVSelNCdDl1Y0FHRnNpS0tRZjZEVTdoOTF0SFlLbWxxRUNBS0RIcEU5VUlaVjRYY3NqMzI4anpPWk90Z0h4YkxTQk9nVDB4aHNIS3lOUnpjcWZENFRBZ01CQUFFQ2dnRUFPMkd1U2VHVzA3ME80L0pURE83Nmd0NjNRSkhPUGtFQ3VGUzZxUUNpc1U1OHJ6NzVQaWtsMWZrZVI2eUIwWWNBL055aXFvMTQ5M0JuY1k3VllRNUJRR0t1em51OTNBaE1zUzM3M21GRk41cHRLRFhWWHg2TVZjZ0JWc0l4OTF2bDFoa2hPYmV3Umd4WFEzVnNKZk9JaUo3MWtiblpYU296MmlvV3paaGxsSk5ybTd6RzkxTlUwZGh0Zm5icjFwdVVUWGxRUnpOcWtVRzdLNHV4cnlGUUJtNmtwMDNLc3h4K3diQUx6QUszb1A3N0tDMEUyaHQzcmdQOXRiN0xocW0vNU9qKzZWbXdxYVJNLy9LTkVvQURqNjU5THI1VFkvUVVVaGZ6ZTA1QmI4VzhBcmJEV1BINXE1OVZDTS9vcEtSdisvdDRBalNQQWxZZnE1TXRoUFBwRVFLQmdRRDl5eURoQXdYd0UyeEd5QWRoU1ROa3ZOZkJkU3JLT2F3V2ZobmUxZzZMNmVraG1GYTU5WTVUbUxmQjZUZ1I4anRaWVZkejhnc2FQNnBwU3M1b2hyVkFTbGRjRVhMc0hrMUlGWFdQdjFZMXhsb0ZBUGNhQ01Fa0xRbEN3a1VpMTNRK3pvSGFsNFNkeXZIbG9jYWhCV0V3ZENUZFZuUUplTzkrRWx6a1NVdUtDUUtCZ1FEU3VKN3dyclVnMjh0Y3dSYkFLWkxjYkZwcTdDVjJQaGN5RjJMQ25BNlRleU1HMEJXYk55dkp1NTZSN1JnVmFaczFGTjRHMWsybnBldjd4OXFRbDFtVGlUbFRrM1JOMXRFcjQzRU9ERUJUUmhGdXNQM092OHhEZGdqYThmc01PWHd5dnFXZ1dmMFZSTExiVkNpTGl1c2VEdGF2Q3pMRDB1R0VsM3l3Uzh0K093S0JnSDIyczdlaHRydy84cjl3Nys3cHdwSmcxSUxZbGZTTDhzbEZkMjBoSFIyREpWN2x4ZmZoUWJuNUNQVDlvQytMaklodXBsSWhrQXhWZ3dVYTcvbG8yTGxhMmNFYVI1SGNSSzJ6SzRPajVJRkltbWltSE1DQm02SmV5SnFQL28wT3FsOCtEYWFJclVFNE9QQmxYUzEvcTYvRHFFc1hPdTFDUVdkeWt4N2xpNHg1QW9HQUZwejdhWWJHSjAyUENGZ3NVZGprU3NWUityRjIzN2FRRks4UHlTU29KOG1LRzd3TzVZWkpLNi8zdDE5RE8yRUc1KzVpV1VkOE0rYUphWTZyOU9KWkdZMGJXczJ6S0h0S0hUU2VPRXkyUm5sNWUzQ0EvRVAyN3JKbkJ0LzYrZmZkVFRES1kyZmswZmg2WFRFdDNMTyt3WTRFR2VyUXV0VVJvSUlGUG9JVHgyc0NnWUVBaEtqOEZVUld5N2p0dlJxMldJdXBoN1ZiY3dVOHJHbDloSm1vWGhENGgvRjFYdnNIWVdnYXd6WmN2TGR3NS9wMCs0TFFaSHFiQ292d3RZdkFNODVyY2UxMDJ4MkNtRzlyMHhSNmtRL2ViZjdqTTA1L29sbjVaN0dvNHZJeThOQzVuck0rNGk5Y0pvc0V3Ujl2ckNObmNScnc0SkZNWkxWQi9aWWFiTkM5UDc4PScsCiAgYWxpcGF5UHVibGljS2V5OiBwcm9jZXNzLmVudi5BTElQQVlfUFVCTElDX0tFWSB8fCAnTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwTFNrZTRrMmJFRzBuVWJmMktHdXdDMXFnZ1BwNitiMWlDWUVyRTJmVGM1SnE1MlFIR0lTVWhpYm4zdWhXNDd0amlsWjRnaE9XbGswMXQ3WDAvRFpReGNmQTFDNEZTTlFXQU5BdFkvYVRhTDd4Szd5NnkyRllVRFExK2xvNEdmNmE1Vm05enJzYVJYbnR0WUhGOW1DQTQxUTRmR0hVcWg5MXpMNDE3ME1RNEVrL0ViUlBPeUcxU3dRaGJWdkFoSktOWE9GOXVtYjZHNXg2cUZFT2Z3cGF1dUNqOG4wT0Zqc3FCNHBLK2dYMkV0dktUazBpUE81eHlkNEFINnYwSy9kWWthQXBFOHFFTWFleGY5aUJXRm4zdkhYV1BkYW42T2N3cC9mc3Y3TGt4YisxdGg5OFlzTDk4Y2J4NFVvbjd2V1FxaUR4Zy9oMDF6dWxnQjI1d0ppVVFJREFRQUInLAogIGdhdGV3YXk6ICdodHRwczovL29wZW5hcGktc2FuZGJveC5kbC5hbGlwYXlkZXYuY29tL2dhdGV3YXkuZG8nLAogIHNpZ25UeXBlOiAnUlNBMicsCiAga2V5VHlwZTogJ1BLQ1M4JywKICBjaGFyc2V0OiAndXRmLTgnCn0pCgpjb25zdCBvcmRlcnMgPSBuZXcgTWFwKCkKCmxldCBIT1NUX0lQID0gJzE5Mi4xNjguMS4xMDYnCnRyeSB7CiAgY29uc3QgbmV0cyA9IHJlcXVpcmUoJ29zJykubmV0d29ya0ludGVyZmFjZXMoKQogIGZvciAoY29uc3QgbmFtZSBvZiBPYmplY3Qua2V5cyhuZXRzKSkgewogICAgZm9yIChjb25zdCBuZXQgb2YgbmV0c1tuYW1lXSkgewogICAgICBpZiAobmV0LmZhbWlseSA9PT0gJ0lQdjQnICYmICFuZXQuaW50ZXJuYWwpIHsKICAgICAgICBIT1NUX0lQID0gbmV0LmFkZHJlc3MKICAgICAgICBicmVhawogICAgICB9CiAgICB9CiAgfQp9IGNhdGNoIChlKSB7fQoKY29uc3QgY2VydE9wdGlvbnMgPSB7fQpjb25zdCBrZXlQYXRoID0gcGF0aC5qb2luKF9fZGlybmFtZSwgJ3NlcnZlci5rZXknKQpjb25zdCBjZXJ0UGF0aCA9IHBhdGguam9pbihfX2Rpcm5hbWUsICdzZXJ2ZXIuY3J0JykKaWYgKGZzLmV4aXN0c1N5bmMoa2V5UGF0aCkgJiYgZnMuZXhpc3RzU3luYyhjZXJ0UGF0aCkpIHsKICBjZXJ0T3B0aW9ucy5rZXkgPSBmcy5yZWFkRmlsZVN5bmMoa2V5UGF0aCkKICBjZXJ0T3B0aW9ucy5jZXJ0ID0gZnMucmVhZEZpbGVTeW5jKGNlcnRQYXRoKQp9CgphcHAuZ2V0KCcvYXBpL2hlYWx0aCcsIChyZXEsIHJlcykgPT4gewogIHJlcy5qc29uKHsgc3RhdHVzOiAnb2snLCB0aW1lOiBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkgfSkKfSkKCmFwcC5wb3N0KCcvYXBpL2FsaXBheS9wcmVjcmVhdGUnLCBhc3luYyAocmVxLCByZXMpID0+IHsKICB0cnkgewogICAgY29uc3QgeyBvcmRlck5vLCBhbW91bnQsIHN1YmplY3QgfSA9IHJlcS5ib2R5CgogICAgaWYgKCFvcmRlck5vIHx8ICFhbW91bnQpIHsKICAgICAgcmV0dXJuIHJlcy5zdGF0dXMoNDAwKS5qc29uKHsgZXJyb3I6ICfnvLrlsJHorqLljZXlj7fmiJbph5Hpop0nIH0pCiAgICB9CgogICAgY29uc3Qgb3JkZXJTdWJqZWN0ID0gc3ViamVjdCB8fCAn5ZWG5ZOB6LSt5LmwJwogICAgY29uc3QgdG90YWxBbW91bnQgPSBwYXJzZUZsb2F0KGFtb3VudCkudG9GaXhlZCgyKQoKICAgIGNvbnN0IGJpekNvbnRlbnQgPSB7CiAgICAgIG91dF90cmFkZV9ubzogb3JkZXJObywKICAgICAgdG90YWxfYW1vdW50OiB0b3RhbEFtb3VudCwKICAgICAgc3ViamVjdDogb3JkZXJTdWJqZWN0LAogICAgICBwcm9kdWN0X2NvZGU6ICdGQUNFX1RPX0ZBQ0VfUEFZTUVOVCcsCiAgICAgIHRpbWVvdXRfZXhwcmVzczogJzMwbScKICAgIH0KCiAgICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGFsaXBheVNkay5leGVjKCdhbGlwYXkudHJhZGUucHJlY3JlYXRlJywgewogICAgICBiaXpDb250ZW50OiBiaXpDb250ZW50CiAgICB9KQoKICAgIGNvbnNvbGUubG9nKCdQcmVjcmVhdGUgcmVzcG9uc2U6JywgSlNPTi5zdHJpbmdpZnkocmVzcG9uc2UpKQoKICAgIGlmIChyZXNwb25zZSAmJiByZXNwb25zZS5jb2RlID09PSAnMTAwMDAnKSB7CiAgICAgIGNvbnN0IHFyQ29kZSA9IHJlc3BvbnNlLnFyQ29kZQogICAgICBjb25zdCB0cmFkZU5vID0gcmVzcG9uc2UudHJhZGVObyB8fCAnJwoKICAgICAgb3JkZXJzLnNldChvcmRlck5vLCB7CiAgICAgICAgdHJhZGVObywKICAgICAgICBhbW91bnQ6IHRvdGFsQW1vdW50LAogICAgICAgIHN1YmplY3Q6IG9yZGVyU3ViamVjdCwKICAgICAgICBzdGF0dXM6ICdXQUlUX0JVWUVSX1BBWScsCiAgICAgICAgcXJDb2RlLAogICAgICAgIGNyZWF0ZWRBdDogbmV3IERhdGUoKS50b0lTT1N0cmluZygpCiAgICAgIH0pCgogICAgICByZXMuanNvbih7CiAgICAgICAgc3VjY2VzczogdHJ1ZSwKICAgICAgICBxckNvZGUsCiAgICAgICAgdHJhZGVObywKICAgICAgICBvcmRlck5vCiAgICAgIH0pCiAgICB9IGVsc2UgewogICAgICByZXMuc3RhdHVzKDUwMCkuanNvbih7CiAgICAgICAgc3VjY2VzczogZmFsc2UsCiAgICAgICAgZXJyb3I6IChyZXNwb25zZSAmJiAocmVzcG9uc2Uuc3ViTXNnIHx8IHJlc3BvbnNlLm1zZykpIHx8ICfpooTkuIvljZXlpLHotKUnLAogICAgICAgIGNvZGU6IHJlc3BvbnNlID8gcmVzcG9uc2UuY29kZSA6IHVuZGVmaW5lZAogICAgICB9KQogICAgfQogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCdQcmVjcmVhdGUgZXJyb3I6JywgZXJyb3IpCiAgICByZXMuc3RhdHVzKDUwMCkuanNvbih7IHN1Y2Nlc3M6IGZhbHNlLCBlcnJvcjogZXJyb3IubWVzc2FnZSB9KQogIH0KfSkKCmFwcC5wb3N0KCcvYXBpL2FsaXBheS9ub3RpZnknLCAocmVxLCByZXMpID0+IHsKICB0cnkgewogICAgY29uc3QgcGFyYW1zID0gcmVxLmJvZHkKCiAgICBpZiAoIXBhcmFtcy5zaWduKSB7CiAgICAgIHJldHVybiByZXMuanNvbignc3VjY2VzcycpCiAgICB9CgogICAgY29uc3QgdmVyaWZ5UGFyYW1zID0geyAuLi5wYXJhbXMgfQogICAgZGVsZXRlIHZlcmlmeVBhcmFtc1snc2lnbiddCiAgICBkZWxldGUgdmVyaWZ5UGFyYW1zWydzaWduX3R5cGUnXQoKICAgIGNvbnN0IHNvcnRlZEtleXMgPSBPYmplY3Qua2V5cyh2ZXJpZnlQYXJhbXMpLnNvcnQoKQogICAgY29uc3Qgc29ydGVkU3RyID0gc29ydGVkS2V5cy5tYXAoayA9PiBgJHtrfT0ke3ZlcmlmeVBhcmFtc1trXX1gKS5qb2luKCcmJykKCiAgICBjb25zdCBzaWduVmVyaWZpZWQgPSBhbGlwYXlTZGsuY2hlY2tOb3RpZnlTaWduKHBhcmFtcykKCiAgICBpZiAoIXNpZ25WZXJpZmllZCkgewogICAgICBjb25zb2xlLmVycm9yKCfnrb7lkI3pqozor4HlpLHotKUnKQogICAgICByZXR1cm4gcmVzLmpzb24oJ2ZhaWx1cmUnKQogICAgfQoKICAgIGNvbnN0IG9yZGVyTm8gPSBwYXJhbXMub3V0X3RyYWRlX25vCiAgICBjb25zdCB0cmFkZVN0YXR1cyA9IHBhcmFtcy50cmFkZV9zdGF0dXMKICAgIGNvbnN0IHRyYWRlTm8gPSBwYXJhbXMudHJhZGVfbm8KICAgIGNvbnN0IHRvdGFsQW1vdW50ID0gcGFyYW1zLnRvdGFsX2Ftb3VudAoKICAgIGNvbnN0IG9yZGVyID0gb3JkZXJzLmdldChvcmRlck5vKQogICAgaWYgKCFvcmRlcikgewogICAgICBjb25zb2xlLmVycm9yKCforqLljZXkuI3lrZjlnKg6Jywgb3JkZXJObykKICAgICAgcmV0dXJuIHJlcy5qc29uKCdmYWlsdXJlJykKICAgIH0KCiAgICBvcmRlci5zdGF0dXMgPSB0cmFkZVN0YXR1cwogICAgb3JkZXIudHJhZGVObyA9IHRyYWRlTm8KICAgIG9yZGVyLnBhaWRBdCA9IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKQoKICAgIGNvbnNvbGUubG9nKCfmlK/ku5jlm57osIPlpITnkIbmiJDlip86JywgewogICAgICBvcmRlck5vLAogICAgICB0cmFkZVN0YXR1cywKICAgICAgdHJhZGVObywKICAgICAgdG90YWxBbW91bnQKICAgIH0pCgogICAgcmVzLmpzb24oJ3N1Y2Nlc3MnKQogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCdOb3RpZnkgZXJyb3I6JywgZXJyb3IpCiAgICByZXMuanNvbignZmFpbHVyZScpCiAgfQp9KQoKYXBwLmdldCgnL2FwaS9vcmRlci86b3JkZXJObycsIChyZXEsIHJlcykgPT4gewogIGNvbnN0IG9yZGVyTm8gPSByZXEucGFyYW1zLm9yZGVyTm8KICBjb25zdCBvcmRlciA9IG9yZGVycy5nZXQob3JkZXJObykKCiAgaWYgKCFvcmRlcikgewogICAgcmV0dXJuIHJlcy5zdGF0dXMoNDA0KS5qc29uKHsgZXJyb3I6ICforqLljZXkuI3lrZjlnKgnIH0pCiAgfQoKICByZXMuanNvbih7IHN1Y2Nlc3M6IHRydWUsIG9yZGVyIH0pCn0pCgphcHAucG9zdCgnL2FwaS9hbGlwYXkvcXVlcnknLCBhc3luYyAocmVxLCByZXMpID0+IHsKICB0cnkgewogICAgY29uc3QgeyBvcmRlck5vIH0gPSByZXEuYm9keQoKICAgIGlmICghb3JkZXJObykgewogICAgICByZXR1cm4gcmVzLnN0YXR1cyg0MDApLmpzb24oeyBlcnJvcjogJ+e8uuWwkeiuouWNleWPtycgfSkKICAgIH0KCiAgICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGFsaXBheVNkay5leGVjKCdhbGlwYXkudHJhZGUucXVlcnknLCB7CiAgICAgIGJpekNvbnRlbnQ6IHsgb3V0X3RyYWRlX25vOiBvcmRlck5vIH0KICAgIH0pCgogICAgY29uc29sZS5sb2coJ1F1ZXJ5IHJlc3BvbnNlOicsIEpTT04uc3RyaW5naWZ5KHJlc3BvbnNlKSkKCiAgICBpZiAocmVzcG9uc2UgJiYgcmVzcG9uc2UuY29kZSA9PT0gJzEwMDAwJykgewogICAgICByZXMuanNvbih7CiAgICAgICAgc3VjY2VzczogdHJ1ZSwKICAgICAgICBzdGF0dXM6IHJlc3BvbnNlLnRyYWRlU3RhdHVzLAogICAgICAgIHRyYWRlTm86IHJlc3BvbnNlLnRyYWRlTm8sCiAgICAgICAgdG90YWxBbW91bnQ6IHJlc3BvbnNlLnRvdGFsQW1vdW50LAogICAgICAgIGJ1eWVyTG9nb25JZDogcmVzcG9uc2UuYnV5ZXJMb2dvbklkCiAgICAgIH0pCiAgICB9IGVsc2UgewogICAgICByZXMuc3RhdHVzKDUwMCkuanNvbih7CiAgICAgICAgc3VjY2VzczogZmFsc2UsCiAgICAgICAgZXJyb3I6IChyZXNwb25zZSAmJiAocmVzcG9uc2Uuc3ViTXNnIHx8IHJlc3BvbnNlLm1zZykpIHx8ICfmn6Xor6LlpLHotKUnCiAgICAgIH0pCiAgICB9CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGNvbnNvbGUuZXJyb3IoJ1F1ZXJ5IGVycm9yOicsIGVycm9yKQogICAgcmVzLnN0YXR1cyg1MDApLmpzb24oeyBzdWNjZXNzOiBmYWxzZSwgZXJyb3I6IGVycm9yLm1lc3NhZ2UgfSkKICB9Cn0pCgphcHAucG9zdCgnL2FwaS9hbGlwYXkvcmVmdW5kJywgYXN5bmMgKHJlcSwgcmVzKSA9PiB7CiAgdHJ5IHsKICAgIGNvbnN0IHsgb3JkZXJObywgcmVmdW5kQW1vdW50LCByZWZ1bmRSZWFzb24gfSA9IHJlcS5ib2R5CgogICAgaWYgKCFvcmRlck5vIHx8ICFyZWZ1bmRBbW91bnQpIHsKICAgICAgcmV0dXJuIHJlcy5zdGF0dXMoNDAwKS5qc29uKHsgZXJyb3I6ICfnvLrlsJHorqLljZXlj7fmiJbpgIDmrL7ph5Hpop0nIH0pCiAgICB9CgogICAgY29uc3Qgb3JkZXIgPSBvcmRlcnMuZ2V0KG9yZGVyTm8pCiAgICBpZiAoIW9yZGVyKSB7CiAgICAgIHJldHVybiByZXMuc3RhdHVzKDQwNCkuanNvbih7IGVycm9yOiAn6K6i5Y2V5LiN5a2Y5ZyoJyB9KQogICAgfQoKICAgIGNvbnN0IHJlZnVuZE5vID0gJ1JFRlVORF8nICsgRGF0ZS5ub3coKQoKICAgIGNvbnN0IHJlc3BvbnNlID0gYXdhaXQgYWxpcGF5U2RrLmV4ZWMoJ2FsaXBheS50cmFkZS5yZWZ1bmQnLCB7CiAgICAgIGJpekNvbnRlbnQ6IHsKICAgICAgICBvdXRfdHJhZGVfbm86IG9yZGVyTm8sCiAgICAgICAgcmVmdW5kX2Ftb3VudDogcGFyc2VGbG9hdChyZWZ1bmRBbW91bnQpLnRvRml4ZWQoMiksCiAgICAgICAgcmVmdW5kX3JlYXNvbjogcmVmdW5kUmVhc29uIHx8ICfnlKjmiLfnlLPor7fpgIDmrL4nLAogICAgICAgIG91dF9yZXF1ZXN0X25vOiByZWZ1bmRObwogICAgICB9CiAgICB9KQoKICAgIGNvbnNvbGUubG9nKCdSZWZ1bmQgcmVzcG9uc2U6JywgSlNPTi5zdHJpbmdpZnkocmVzcG9uc2UpKQoKICAgIGlmIChyZXNwb25zZSAmJiByZXNwb25zZS5jb2RlID09PSAnMTAwMDAnKSB7CiAgICAgIHJlcy5qc29uKHsKICAgICAgICBzdWNjZXNzOiB0cnVlLAogICAgICAgIHJlZnVuZElkOiByZXNwb25zZS5yZWZ1bmRJZCwKICAgICAgICByZWZ1bmRObwogICAgICB9KQogICAgfSBlbHNlIHsKICAgICAgcmVzLnN0YXR1cyg1MDApLmpzb24oewogICAgICAgIHN1Y2Nlc3M6IGZhbHNlLAogICAgICAgIGVycm9yOiAocmVzcG9uc2UgJiYgKHJlc3BvbnNlLnN1Yk1zZyB8fCByZXNwb25zZS5tc2cpKSB8fCAn6YCA5qy+5aSx6LSlJwogICAgICB9KQogICAgfQogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCdSZWZ1bmQgZXJyb3I6JywgZXJyb3IpCiAgICByZXMuc3RhdHVzKDUwMCkuanNvbih7IHN1Y2Nlc3M6IGZhbHNlLCBlcnJvcjogZXJyb3IubWVzc2FnZSB9KQogIH0KfSkKCmFwcC5saXN0ZW4oUE9SVCwgJzAuMC4wLjAnLCAoKSA9PiB7CiAgY29uc29sZS5sb2coYFxuPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PWApCiAgY29uc29sZS5sb2coYCAg5pSv5LuY5a6d5ZWG5Z+O5ZCO56uv5pyN5Yqh5bey5ZCv5YqoYCkKICBjb25zb2xlLmxvZyhgICBIVFRQIOerr+WPozogJHtQT1JUfWApCiAgY29uc29sZS5sb2coYCAg5pys5Zyw6K6/6ZeuOiBodHRwOi8vbG9jYWxob3N0OiR7UE9SVH1gKQogIGNvbnNvbGUubG9nKGAgIOe9kee7nOiuv+mXrjogaHR0cDovLyR7SE9TVF9JUH06JHtQT1JUfWApCiAgY29uc29sZS5sb2coYD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbmApCiAgY29uc29sZS5sb2coYCAgQVBJIOaOpeWPozpgKQogIGNvbnNvbGUubG9nKGAgIFBPU1QgL2FwaS9hbGlwYXkvcHJlY3JlYXRlICAtIOWIm+W7uuaUr+S7mOiuouWNlWApCiAgY29uc29sZS5sb2coYCAgUE9TVCAvYXBpL2FsaXBheS9ub3RpZnkgICAgIC0g5o6l5pS25pSv5LuY5Zue6LCDYCkKICBjb25zb2xlLmxvZyhgICBHRVQgIC9hcGkvb3JkZXIvOm9yZGVyTm8gICAgLSDmn6Xor6LmnKzlnLDorqLljZVgKQogIGNvbnNvbGUubG9nKGAgIFBPU1QgL2FwaS9hbGlwYXkvcXVlcnkgICAgIC0g5p+l6K+i5pSv5LuY5a6d6K6i5Y2VYCkKICBjb25zb2xlLmxvZyhgICBQT1NUIC9hcGkvYWxpcGF5L3JlZnVuZCAgICAtIOeUs+ivt+mAgOasvmApCiAgY29uc29sZS5sb2coYCAgR0VUICAvYXBpL2hlYWx0aCAgICAgICAgICAgLSDlgaXlurfmo4Dmn6VgKQogIGNvbnNvbGUubG9nKGBcbj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbmApCn0pCgppZiAoY2VydE9wdGlvbnMua2V5ICYmIGNlcnRPcHRpb25zLmNlcnQpIHsKICBjb25zdCBIVFRQU19QT1JUID0gMzAwMQogIGh0dHBzLmNyZWF0ZVNlcnZlcihjZXJ0T3B0aW9ucywgYXBwKS5saXN0ZW4oSFRUUFNfUE9SVCwgJzAuMC4wLjAnLCAoKSA9PiB7CiAgICBjb25zb2xlLmxvZyhgICBIVFRQUyDnq6/lj6M6ICR7SFRUUFNfUE9SVH0gKOiHquetvuWQjeivgeS5pilgKQogICAgY29uc29sZS5sb2coYCAg572R57uc6K6/6ZeuOiBodHRwczovLyR7SE9TVF9JUH06JHtIVFRQU19QT1JUfWApCiAgICBjb25zb2xlLmxvZyhgICDmiYvmnLrpnIDlhYjkv6Hku7vor4HkuaY6ICR7SE9TVF9JUH06JHtIVFRQU19QT1JUfS9hcGkvaGVhbHRoYCkKICAgIGNvbnNvbGUubG9nKGBcbj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbmApCiAgfSkKfQo=
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const https = require('https')
+const fs = require('fs')
+const path = require('path')
+const AlipaySdk = require('alipay-sdk').default
+const crypto = require('crypto')
+
+const app = express()
+const PORT = process.env.PORT || 3000
+
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+const alipaySdk = new AlipaySdk({
+  appId: process.env.ALIPAY_APP_ID || '9021000166665731',
+  privateKey: process.env.ALIPAY_PRIVATE_KEY || 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQ56iKMCJfj3YnZrw6WVfLr/DRqagGQZATc3zeuI0TIaBoKOcoAiTJ/kWgwEx9EEqW/fkzRftB/ocqevn3OkGyFPWO8DAJ+ph5aAAPWgu/aFqDf0larrVfJAF3lyGCudYBHNXPVp2lEFRtnaEWyysqcS6NuiaL6k01KsPDsGUZgySlOuqAAKFWhPvJDR9IzF5WAOCZmLlaEgf5CDmmX+WwQMNx0KnIcMIEKeD0ZsSlWj+SLSN7N5hR89Y1EDFwQLDuRzSBt9ucAGFsiKKQf6DU7h91tHYKmlqECAKDHpE9UIZV4Xcsj328jzOZOtgHxbLSBOgT0xhsHKyNRzcqfD4TAgMBAAECggEAO2GuSeGW070O4/JTDO76gt63QJHOPkECuFS6qQCisU58rz75Pikl1fkeR6yB0YcA/Nyiqo1493BncY7VYQ5BQGKuznu93AhMsS373mFFN5ptKDXVXx6MVcgBVsIx91vl1hkhObewRgxXQ3VsJfOIiJ71kbnZXSoz2ioWzZhllJNrm7zG91NU0dhtfnbr1puUTXlQRzNqkUG7K4uxryFQBm6kp03Ksxx+wbALzAK3oP77KC0E2ht3rgP9tb7Lhqm/5Oj+6VmwqaRM//KNEoADj659Lr5TY/QUUhfze05Bb8W8ArbDWPH5q59VCM/opKRv+/t4AjSPAlYfq5MthPPpEQKBgQD9yyDhAwXwE2xGyAdhSTNkvNfBdSrKOawWfhne1g6L6ekhmFa59Y5TmLfB6TgR8jtZYVdz8gsaP6ppSs5ohrVASldcEXLsHk1IFXWPv1Y1xloFAPcaCMEkLQlCwkUi13Q+zoHal4SdyvHlocahBWEwdCTdVnQJeO9+ElzkSUuKCQKBgQDSuJ7wrrUg28tcwRbAKZLcbFpq7CV2PhcyF2LCnA6TeyMG0BWbNyvJu56R7RgVaZs1FN4G1k2npev7x9qQl1mTiTlTk3RN1tEr43EODEBTRhFusP3Ov8xDdgja8fsMOXwyvqWgWf0VRLLbVCiLiuseDtavCzLD0uGEl3ywS8t+OwKBgH22s7ehtrw/8r9w7+7pwpJg1ILYlfSL8slFd20hHR2DJV7lxffhQbn5CPT9oC+LjIhuplIhkAxVgwUa7/lo2Lla2cEaR5HcRK2zK4Oj5IFImmimHMCBm6JeyJqP/o0Oql8+DaaIrUE4OPBlXS1/q6/DqEsXOu1CQWdykx7li4x5AoGAFpz7aYbGJ02PCFgsUdjkSsVR+rF237aQFK8PySSoJ8mKG7wO5YZJK6/3t19DO2EG5+5iWUd8M+aJaY6r9OJZGY0bWs2zKHtKHTSeOEy2Rnl5e3CA/EP27rJnBt/6+ffdTTDKY2fk0fh6XTEt3LO+wY4EGerQutURoIIFPoITx2sCgYEAhKj8FURWy7jtvRq2WIuph7VbcwU8rGl9hJmoXhD4h/F1XvsHYWgawzZcvLdw5/p0+4LQZHqbCovwtYvAM85rce102x2CmG9r0xR6kQ/ebf7jM05/oln5Z7Go4vIy8NC5nrM+4i9cJosEwR9vrCNncRrw4JFMZLVB/ZYabNC9P78=',
+  alipayPublicKey: process.env.ALIPAY_PUBLIC_KEY || 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApLSke4k2bEG0nUbf2KGuwC1qggPp6+b1iCYErE2fTc5Jq52QHGISUhibn3uhW47tjilZ4ghOWlk01t7X0/DZQxcfA1C4FSNQWANAtY/aTaL7xK7y6y2FYUDQ1+lo4Gf6a5Vm9zrsaRXnttYHF9mCA41Q4fGHUqh91zL4170MQ4Ek/EbRPOyG1SwQhbVvAhJKNXOF9umb6G5x6qFEOfwpauuCj8n0OFjsqB4pK+gX2EtvKTk0iPO5xyd4AH6v0K/dYkaApE8qEMaexf9iBWFn3vHXWPdan6Ocwp/fsv7Lkxb+1th98YsL98cbx4Uon7vWQqiDxg/h01zulgB25wJiUQIDAQAB',
+  gateway: 'https://openapi-sandbox.dl.alipaydev.com/gateway.do',
+  signType: 'RSA2',
+  keyType: 'PKCS8',
+  charset: 'utf-8'
+})
+
+const orders = new Map()
+
+let HOST_IP = '192.168.1.106'
+try {
+  const nets = require('os').networkInterfaces()
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        HOST_IP = net.address
+        break
+      }
+    }
+  }
+} catch (e) {}
+
+const certOptions = {}
+const keyPath = path.join(__dirname, 'server.key')
+const certPath = path.join(__dirname, 'server.crt')
+if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+  certOptions.key = fs.readFileSync(keyPath)
+  certOptions.cert = fs.readFileSync(certPath)
+}
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() })
+})
+
+app.post('/api/alipay/precreate', async (req, res) => {
+  try {
+    const { orderNo, amount, subject } = req.body
+
+    if (!orderNo || !amount) {
+      return res.status(400).json({ error: '缺少订单号或金额' })
+    }
+
+    const orderSubject = subject || '商品购买'
+    const totalAmount = parseFloat(amount).toFixed(2)
+
+    const bizContent = {
+      out_trade_no: orderNo,
+      total_amount: totalAmount,
+      subject: orderSubject,
+      product_code: 'FACE_TO_FACE_PAYMENT',
+      timeout_express: '30m'
+    }
+
+    const response = await alipaySdk.exec('alipay.trade.precreate', {
+      bizContent: bizContent
+    })
+
+    console.log('Precreate response:', JSON.stringify(response))
+
+    if (response && response.code === '10000') {
+      const qrCode = response.qrCode
+      const tradeNo = response.tradeNo || ''
+
+      orders.set(orderNo, {
+        tradeNo,
+        amount: totalAmount,
+        subject: orderSubject,
+        status: 'WAIT_BUYER_PAY',
+        qrCode,
+        createdAt: new Date().toISOString()
+      })
+
+      res.json({
+        success: true,
+        qrCode,
+        tradeNo,
+        orderNo
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '预下单失败',
+        code: response ? response.code : undefined
+      })
+    }
+  } catch (error) {
+    console.error('Precreate error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/alipay/notify', (req, res) => {
+  try {
+    const params = req.body
+
+    if (!params.sign) {
+      return res.json('success')
+    }
+
+    const verifyParams = { ...params }
+    delete verifyParams['sign']
+    delete verifyParams['sign_type']
+
+    const sortedKeys = Object.keys(verifyParams).sort()
+    const sortedStr = sortedKeys.map(k => `${k}=${verifyParams[k]}`).join('&')
+
+    const signVerified = alipaySdk.checkNotifySign(params)
+
+    if (!signVerified) {
+      console.error('签名验证失败')
+      return res.json('failure')
+    }
+
+    const orderNo = params.out_trade_no
+    const tradeStatus = params.trade_status
+    const tradeNo = params.trade_no
+    const totalAmount = params.total_amount
+
+    const order = orders.get(orderNo)
+    if (!order) {
+      console.error('订单不存在:', orderNo)
+      return res.json('failure')
+    }
+
+    order.status = tradeStatus
+    order.tradeNo = tradeNo
+    order.paidAt = new Date().toISOString()
+
+    console.log('支付回调处理成功:', {
+      orderNo,
+      tradeStatus,
+      tradeNo,
+      totalAmount
+    })
+
+    res.json('success')
+  } catch (error) {
+    console.error('Notify error:', error)
+    res.json('failure')
+  }
+})
+
+app.get('/api/order/:orderNo', (req, res) => {
+  const orderNo = req.params.orderNo
+  const order = orders.get(orderNo)
+
+  if (!order) {
+    return res.status(404).json({ error: '订单不存在' })
+  }
+
+  res.json({ success: true, order })
+})
+
+app.post('/api/alipay/query', async (req, res) => {
+  try {
+    const { orderNo } = req.body
+
+    if (!orderNo) {
+      return res.status(400).json({ error: '缺少订单号' })
+    }
+
+    const response = await alipaySdk.exec('alipay.trade.query', {
+      bizContent: { out_trade_no: orderNo }
+    })
+
+    console.log('Query response:', JSON.stringify(response))
+
+    if (response && response.code === '10000') {
+      res.json({
+        success: true,
+        status: response.tradeStatus,
+        tradeNo: response.tradeNo,
+        totalAmount: response.totalAmount,
+        buyerLogonId: response.buyerLogonId
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '查询失败'
+      })
+    }
+  } catch (error) {
+    console.error('Query error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/alipay/refund', async (req, res) => {
+  try {
+    const { orderNo, refundAmount, refundReason } = req.body
+
+    if (!orderNo || !refundAmount) {
+      return res.status(400).json({ error: '缺少订单号或退款金额' })
+    }
+
+    const order = orders.get(orderNo)
+    if (!order) {
+      return res.status(404).json({ error: '订单不存在' })
+    }
+
+    const refundNo = 'REFUND_' + Date.now()
+
+    const response = await alipaySdk.exec('alipay.trade.refund', {
+      bizContent: {
+        out_trade_no: orderNo,
+        refund_amount: parseFloat(refundAmount).toFixed(2),
+        refund_reason: refundReason || '用户申请退款',
+        out_request_no: refundNo
+      }
+    })
+
+    console.log('Refund response:', JSON.stringify(response))
+
+    if (response && response.code === '10000') {
+      res.json({
+        success: true,
+        refundId: response.refundId,
+        refundNo
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '退款失败'
+      })
+    }
+  } catch (error) {
+    console.error('Refund error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n========================================`)
+  console.log(`  支付宝商城后端服务已启动`)
+  console.log(`  HTTP 端口: ${PORT}`)
+  console.log(`  本地访问: http://localhost:${PORT}`)
+  console.log(`  网络访问: http://${HOST_IP}:${PORT}`)
+  console.log(`========================================\n`)
+  console.log(`  API 接口:`)
+  console.log(`  POST /api/alipay/precreate  - 创建支付订单`)
+  console.log(`  POST /api/alipay/notify     - 接收支付回调`)
+  console.log(`  GET  /api/order/:orderNo    - 查询本地订单`)
+  console.log(`  POST /api/alipay/query     - 查询支付宝订单`)
+  console.log(`  POST /api/alipay/refund    - 申请退款`)
+  console.log(`  GET  /api/health           - 健康检查`)
+  console.log(`\n========================================\n`)
+})
+
+if (certOptions.key && certOptions.cert) {
+  const HTTPS_PORT = 3001
+  https.createServer(certOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
+    console.log(`  HTTPS 端口: ${HTTPS_PORT} (自签名证书)`)
+    console.log(`  网络访问: https://${HOST_IP}:${HTTPS_PORT}`)
+    console.log(`  手机需先信任证书: ${HOST_IP}:${HTTPS_PORT}/api/health`)
+    console.log(`\n========================================\n`)
+  })
+}
