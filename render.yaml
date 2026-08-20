@@ -1,1 +1,17 @@
-c2VydmljZXM6CiAgLSBuYW1lOiBhbGlwYXktbWFsbC1iYWNrZW5kCiAgICB0eXBlOiB3ZWIKICAgIGVudjogbm9kZQogICAgcGxhbjogZnJlZQogICAgcmVnaW9uOiBzaW5nYXBvcmUKICAgIGJ1aWxkQ29tbWFuZDogbnBtIGluc3RhbGwKICAgIHN0YXJ0Q29tbWFuZDogbm9kZSBzZXJ2ZXIuanMKICAgIGVudlZhcnM6CiAgICAgIC0ga2V5OiBQT1JUCiAgICAgICAgdmFsdWU6IDEwMDAwCiAgICAgIC0ga2V5OiBBTElQQVlfQVBQX0lECiAgICAgICAgdmFsdWU6ICI5MDIxMDAwMTY2NjY1NzMxIgogICAgICAtIGtleTogQUxJUEFZX1BSSVZBVEVfS0VZCiAgICAgICAgdmFsdWU6ICJZT1VSX1BSSVZBVEVfS0VZX0hFUkUiCiAgICAgIC0ga2V5OiBBTElQQVlfUFVCTElDX0tFWQogICAgICAgIHZhbHVlOiAiWU9VUl9QVUJMSUNfS0VZX0hFUkUiCg==
+services:
+  - name: alipay-mall-backend
+    type: web
+    env: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ALIPAY_APP_ID
+        value: "9021000166665731"
+      - key: ALIPAY_PRIVATE_KEY
+        value: "YOUR_PRIVATE_KEY_HERE"
+      - key: ALIPAY_PUBLIC_KEY
+        value: "YOUR_PUBLIC_KEY_HERE"
