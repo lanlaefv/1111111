@@ -5,7 +5,7 @@ services:
     plan: free
     region: singapore
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: node src/server.js
     envVars:
       - key: PORT
         value: "10000"
