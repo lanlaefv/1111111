@@ -8,10 +8,4 @@ services:
     startCommand: node server.js
     envVars:
       - key: PORT
-        value: 10000
-      - key: ALIPAY_APP_ID
-        value: "9021000166665731"
-      - key: ALIPAY_PRIVATE_KEY
-        value: "YOUR_PRIVATE_KEY_HERE"
-      - key: ALIPAY_PUBLIC_KEY
-        value: "YOUR_PUBLIC_KEY_HERE"
+        value: "10000"
