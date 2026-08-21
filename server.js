@@ -51,12 +51,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() })
 })
 
-// 鐢ㄦ巿鏉冪爜鎹㈠彇 buyer_open_id
 app.post('/api/alipay/auth', async (req, res) => {
   try {
     const { authCode } = req.body
     if (!authCode) {
-      return res.status(400).json({ error: '缂哄皯鎺堟潈鐮? })
+      return res.status(400).json({ error: 'Missing authCode' })
     }
 
     const response = await alipaySdk.exec('alipay.system.oauth.token', {
@@ -75,7 +74,7 @@ app.post('/api/alipay/auth', async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        error: (response && (response.subMsg || response.msg)) || '鎺堟潈澶辫触'
+        error: (response && (response.subMsg || response.msg)) || 'Auth failed'
       })
     }
   } catch (error) {
@@ -89,10 +88,10 @@ app.post('/api/alipay/create', async (req, res) => {
     const { orderNo, amount, subject, buyerOpenId } = req.body
 
     if (!orderNo || !amount) {
-      return res.status(400).json({ error: '缂哄皯璁㈠崟鍙锋垨閲戦' })
+      return res.status(400).json({ error: 'Missing orderNo or amount' })
     }
 
-    const orderSubject = subject || '鍟嗗搧璐拱'
+    const orderSubject = subject || 'Purchase'
     const totalAmount = parseFloat(amount).toFixed(2)
 
     const bizContent = {
@@ -104,7 +103,6 @@ app.post('/api/alipay/create', async (req, res) => {
       notify_url: 'https://alipay-mall-backend.onrender.com/api/alipay/notify'
     }
 
-    // 浼犲叆涔板 open_id
     if (buyerOpenId) {
       bizContent.buyer_open_id = buyerOpenId
     }
@@ -135,7 +133,7 @@ app.post('/api/alipay/create', async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        error: (response && (response.subMsg || response.msg)) || '鍒涘缓浜ゆ槗澶辫触',
+        error: (response && (response.subMsg || response.msg)) || 'Create trade failed',
         code: response ? response.code : undefined
       })
     }
@@ -157,13 +155,10 @@ app.post('/api/alipay/notify', (req, res) => {
     delete verifyParams['sign']
     delete verifyParams['sign_type']
 
-    const sortedKeys = Object.keys(verifyParams).sort()
-    const sortedStr = sortedKeys.map(k => `${k}=${verifyParams[k]}`).join('&')
-
     const signVerified = alipaySdk.checkNotifySign(params)
 
     if (!signVerified) {
-      console.error('绛惧悕楠岃瘉澶辫触')
+      console.error('Sign verification failed')
       return res.json('failure')
     }
 
@@ -174,7 +169,7 @@ app.post('/api/alipay/notify', (req, res) => {
 
     const order = orders.get(orderNo)
     if (!order) {
-      console.error('璁㈠崟涓嶅瓨鍦?', orderNo)
+      console.error('Order not found:', orderNo)
       return res.json('failure')
     }
 
@@ -182,7 +177,7 @@ app.post('/api/alipay/notify', (req, res) => {
     order.tradeNo = tradeNo
     order.paidAt = new Date().toISOString()
 
-    console.log('鏀粯鍥炶皟澶勭悊鎴愬姛:', {
+    console.log('Payment notify processed:', {
       orderNo,
       tradeStatus,
       tradeNo,
@@ -201,7 +196,7 @@ app.get('/api/order/:orderNo', (req, res) => {
   const order = orders.get(orderNo)
 
   if (!order) {
-    return res.status(404).json({ error: '璁㈠崟涓嶅瓨鍦? })
+    return res.status(404).json({ error: 'Order not found' })
   }
 
   res.json({ success: true, order })
@@ -212,7 +207,7 @@ app.post('/api/alipay/query', async (req, res) => {
     const { orderNo } = req.body
 
     if (!orderNo) {
-      return res.status(400).json({ error: '缂哄皯璁㈠崟鍙? })
+      return res.status(400).json({ error: 'Missing orderNo' })
     }
 
     const response = await alipaySdk.exec('alipay.trade.query', {
@@ -232,7 +227,7 @@ app.post('/api/alipay/query', async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        error: (response && (response.subMsg || response.msg)) || '鏌ヨ澶辫触'
+        error: (response && (response.subMsg || response.msg)) || 'Query failed'
       })
     }
   } catch (error) {
@@ -246,12 +241,12 @@ app.post('/api/alipay/refund', async (req, res) => {
     const { orderNo, refundAmount, refundReason } = req.body
 
     if (!orderNo || !refundAmount) {
-      return res.status(400).json({ error: '缂哄皯璁㈠崟鍙锋垨閫€娆鹃噾棰? })
+      return res.status(400).json({ error: 'Missing orderNo or refundAmount' })
     }
 
     const order = orders.get(orderNo)
     if (!order) {
-      return res.status(404).json({ error: '璁㈠崟涓嶅瓨鍦? })
+      return res.status(404).json({ error: 'Order not found' })
     }
 
     const refundNo = 'REFUND_' + Date.now()
@@ -260,7 +255,7 @@ app.post('/api/alipay/refund', async (req, res) => {
       bizContent: {
         out_trade_no: orderNo,
         refund_amount: parseFloat(refundAmount).toFixed(2),
-        refund_reason: refundReason || '鐢ㄦ埛鐢宠閫€娆?,
+        refund_reason: refundReason || 'User requested refund',
         out_request_no: refundNo
       }
     })
@@ -276,7 +271,7 @@ app.post('/api/alipay/refund', async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        error: (response && (response.subMsg || response.msg)) || '閫€娆惧け璐?
+        error: (response && (response.subMsg || response.msg)) || 'Refund failed'
       })
     }
   } catch (error) {
@@ -286,28 +281,35 @@ app.post('/api/alipay/refund', async (req, res) => {
 })
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n========================================`)
-  console.log(`  鏀粯瀹濆晢鍩庡悗绔湇鍔″凡鍚姩`)
-  console.log(`  HTTP 绔彛: ${PORT}`)
-  console.log(`  鏈湴璁块棶: http://localhost:${PORT}`)
-  console.log(`  缃戠粶璁块棶: http://${HOST_IP}:${PORT}`)
-  console.log(`========================================\n`)
-  console.log(`  API 鎺ュ彛:`)
-  console.log(`  POST /api/alipay/precreate  - 鍒涘缓鏀粯璁㈠崟`)
-  console.log(`  POST /api/alipay/notify     - 鎺ユ敹鏀粯鍥炶皟`)
-  console.log(`  GET  /api/order/:orderNo    - 鏌ヨ鏈湴璁㈠崟`)
-  console.log(`  POST /api/alipay/query     - 鏌ヨ鏀粯瀹濊鍗昤)
-  console.log(`  POST /api/alipay/refund    - 鐢宠閫€娆綻)
-  console.log(`  GET  /api/health           - 鍋ュ悍妫€鏌)
-  console.log(`\n========================================\n`)
+  console.log('')
+  console.log('========================================')
+  console.log('  Alipay Mall Backend Started')
+  console.log('  HTTP Port: ' + PORT)
+  console.log('  Local: http://localhost:' + PORT)
+  console.log('  Network: http://' + HOST_IP + ':' + PORT)
+  console.log('========================================')
+  console.log('')
+  console.log('  API Endpoints:')
+  console.log('  POST /api/alipay/auth    - OAuth token exchange')
+  console.log('  POST /api/alipay/create  - Create JSAPI trade')
+  console.log('  POST /api/alipay/notify  - Payment callback')
+  console.log('  GET  /api/order/:orderNo - Query local order')
+  console.log('  POST /api/alipay/query   - Query alipay order')
+  console.log('  POST /api/alipay/refund  - Apply refund')
+  console.log('  GET  /api/health         - Health check')
+  console.log('')
+  console.log('========================================')
+  console.log('')
 })
 
 if (certOptions.key && certOptions.cert) {
   const HTTPS_PORT = 3001
   https.createServer(certOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log(`  HTTPS 绔彛: ${HTTPS_PORT} (鑷鍚嶈瘉涔?`)
-    console.log(`  缃戠粶璁块棶: https://${HOST_IP}:${HTTPS_PORT}`)
-    console.log(`  鎵嬫満闇€鍏堜俊浠昏瘉涔? ${HOST_IP}:${HTTPS_PORT}/api/health`)
-    console.log(`\n========================================\n`)
+    console.log('  HTTPS Port: ' + HTTPS_PORT + ' (self-signed cert)')
+    console.log('  Network: https://' + HOST_IP + ':' + HTTPS_PORT)
+    console.log('  Mobile trust first: https://' + HOST_IP + ':' + HTTPS_PORT + '/api/health')
+    console.log('')
+    console.log('========================================')
+    console.log('')
   })
 }
