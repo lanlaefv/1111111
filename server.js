@@ -55,8 +55,23 @@ function parsePublicKey(keyStr) {
   }
 }
 
+console.log('=== Alipay Config ===')
+console.log('APP_ID:', APP_ID)
+console.log('PRIVATE_KEY source:', process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'default')
+console.log('PUBLIC_KEY source:', process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default')
+console.log('PRIVATE_KEY length:', RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0)
+console.log('PUBLIC_KEY length:', RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0)
+console.log('PRIVATE_KEY preview:', RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.substring(0, 20) + '...' : 'empty')
+console.log('PUBLIC_KEY preview:', RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.substring(0, 20) + '...' : 'empty')
+console.log('PRIVATE_KEY contains PRIVATE KEY:', RAW_PRIVATE_KEY && RAW_PRIVATE_KEY.includes('PRIVATE KEY'))
+console.log('PUBLIC_KEY contains PUBLIC KEY:', RAW_PUBLIC_KEY && RAW_PUBLIC_KEY.includes('PUBLIC KEY'))
+
 const PRIVATE_KEY = parsePrivateKey(RAW_PRIVATE_KEY)
 const PUBLIC_KEY = parsePublicKey(RAW_PUBLIC_KEY)
+
+console.log('Parsed PRIVATE_KEY starts with:', PRIVATE_KEY ? PRIVATE_KEY.substring(0, 30) + '...' : 'empty')
+console.log('Parsed PUBLIC_KEY starts with:', PUBLIC_KEY ? PUBLIC_KEY.substring(0, 30) + '...' : 'empty')
+console.log('====================')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -73,6 +88,22 @@ const alipaySdk = new AlipaySdk({
   signType: 'RSA2',
   keyType: 'PKCS8',
   charset: 'utf-8'
+})
+
+app.get('/api/diagnose', (req, res) => {
+  res.json({
+    appId: APP_ID,
+    privateKeySource: process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'default',
+    publicKeySource: process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default',
+    privateKeyLength: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0,
+    publicKeyLength: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0,
+    privateKeyHasPemHeader: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.includes('PRIVATE KEY') : false,
+    publicKeyHasPemHeader: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.includes('PUBLIC KEY') : false,
+    privateKeyParsed: PRIVATE_KEY ? PRIVATE_KEY.startsWith('-----') : false,
+    publicKeyParsed: PUBLIC_KEY ? PUBLIC_KEY.startsWith('-----') : false,
+    privateKeyPreview: PRIVATE_KEY ? PRIVATE_KEY.substring(0, 50) + '...' : 'empty',
+    publicKeyPreview: PUBLIC_KEY ? PUBLIC_KEY.substring(0, 50) + '...' : 'empty'
+  })
 })
 
 const orders = new Map()
