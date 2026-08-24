@@ -71,7 +71,7 @@ if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
   certOptions.cert = fs.readFileSync(certPath)
 }
 
-const BASE_URL = process.env.BASE_URL || `http://${HOST_IP}:${PORT}`
+const BASE_URL = process.env.BASE_URL || 'https://alipay-mall-backend.onrender.com'
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() })
