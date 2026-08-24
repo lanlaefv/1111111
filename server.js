@@ -307,6 +307,7 @@ app.post('/api/alipay/refund', async (req, res) => {
 
 // 内存存储签约关系（生产环境应使用数据库）
 const agreements = new Map() // key: externalUserId -> { agreementNo, alipayUserId, alipayLogonId, status, signTime, externalUserId }
+const signSessions = new Map() // key: sessionId -> { id, subject, amount, industry, signees: [{externalUserId, agreementNo, signTime}], createdAt }
 
 // 解析回调参数（支持 form-urlencoded）
 function parseNotifyParams(body) {
@@ -433,6 +434,157 @@ app.get('/api/alipay/agreement/query', async (req, res) => {
   }
 })
 
+// ===== 一码多签：Session 管理 =====
+
+// 5. 创建签约会话 POST /api/alipay/agreement/session/create
+app.post('/api/alipay/agreement/session/create', (req, res) => {
+  try {
+    const { subject, amount, industry } = req.body || {}
+
+    const sessionId = 'SES_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
+    const session = {
+      id: sessionId,
+      subject: subject || '预授权代扣',
+      amount: amount || '0.00',
+      industry: industry || 'DEFAULT',
+      signees: [],
+      createdAt: new Date().toISOString()
+    }
+    signSessions.set(sessionId, session)
+
+    const BASE = process.env.BASE_URL || `http://${HOST_IP}:${PORT}`
+    const scanUrl = `${BASE}/api/alipay/agreement/scan?session=${sessionId}`
+
+    console.log('Session created:', sessionId, 'scanUrl:', scanUrl)
+    res.json({
+      sessionId,
+      scanUrl,
+      sessionInfo: {
+        subject: session.subject,
+        amount: session.amount,
+        industry: session.industry,
+        signeesCount: 0,
+        createdAt: session.createdAt
+      }
+    })
+  } catch (error) {
+    console.error('Session create error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// 6. 用户扫码签约 GET /api/alipay/agreement/scan?session=xxx
+app.get('/api/alipay/agreement/scan', async (req, res) => {
+  try {
+    const { session } = req.query
+
+    if (!session) {
+      return res.status(400).send('Missing session parameter')
+    }
+
+    const sess = signSessions.get(session)
+    if (!sess) {
+      return res.status(404).send('Session not found or expired')
+    }
+
+    const externalUserId = `${session}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+    const industryCode = sess.industry || 'DEFAULT'
+    const signScene = `INDUSTRY|${industryCode}`
+
+    const bizContent = {
+      external_agreement_no: externalUserId,
+      external_user_display_name: sess.subject || '预授权代扣',
+      sign_validity_period: '12m',
+      pass_params: JSON.stringify({ externalUserId, sessionId: session, industry: industryCode }),
+      sign_scene: signScene,
+      access_params: { channel: 'ALIPAYAPP' },
+      personal_product_code: 'CYCLE_PAY_AUTH',
+      sales_plan_code: 'PREAUTH'
+    }
+
+    const response = await alipaySdk.exec('alipay.user.agreement.sign', {
+      bizContent
+    })
+
+    console.log('Scan sign response:', JSON.stringify(response))
+
+    if (response && response.code === '10000' && response.sign_url) {
+      agreements.set(externalUserId, {
+        externalUserId,
+        requestNo: 'SCAN_' + Date.now(),
+        status: 'pending',
+        signTime: new Date().toISOString(),
+        sessionId: session
+      })
+
+      sess.signees.push({
+        externalUserId,
+        agreementNo: null,
+        signTime: new Date().toISOString(),
+        status: 'pending'
+      })
+      signSessions.set(session, sess)
+
+      res.redirect(response.sign_url)
+    } else {
+      const errMsg = (response && (response.subMsg || response.msg)) || 'Sign failed'
+      res.status(500).send('签约失败: ' + errMsg)
+    }
+  } catch (error) {
+    console.error('Agreement scan error:', error)
+    res.status(500).send('Server error')
+  }
+})
+
+// 7. 查询会话签约列表 GET /api/alipay/agreement/session/:sessionId/signees
+app.get('/api/alipay/agreement/session/:sessionId/signees', (req, res) => {
+  try {
+    const { sessionId } = req.params
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Missing sessionId' })
+    }
+
+    const sess = signSessions.get(sessionId)
+    if (!sess) {
+      return res.status(404).json({ error: 'Session not found' })
+    }
+
+    const signees = sess.signees.map(s => {
+      const ag = agreements.get(s.externalUserId)
+      return {
+        externalUserId: s.externalUserId,
+        agreementNo: ag ? ag.agreementNo : null,
+        signTime: s.signTime,
+        status: ag ? ag.status : 'pending',
+        deductStatus: s.deductStatus || 'pending',
+        deductTradeNo: s.deductTradeNo || null,
+        deductAmount: s.deductAmount || null,
+        deductTime: s.deductTime || null,
+        deductError: s.deductError || null
+      }
+    })
+
+    const activeCount = signees.filter(s => s.status === 'active').length
+
+    res.json({
+      sessionId,
+      sessionInfo: {
+        subject: sess.subject,
+        amount: sess.amount,
+        industry: sess.industry,
+        createdAt: sess.createdAt
+      },
+      signees,
+      totalCount: signees.length,
+      activeCount
+    })
+  } catch (error) {
+    console.error('Session signees error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // 3. 签约异步通知 POST /api/alipay/agreement/notify
 app.post('/api/alipay/agreement/notify', (req, res) => {
   try {
@@ -454,25 +606,104 @@ app.post('/api/alipay/agreement/notify', (req, res) => {
     const externalAgreementNo = params.external_agreement_no
     const signTime = params.sign_time || new Date().toISOString()
 
-    // pass_params 中保存了 externalUserId
+    // pass_params 中保存了 externalUserId 和 sessionId
     let externalUserId = externalAgreementNo
+    let sessionId = null
     try {
       if (params.pass_params) {
         const passParams = JSON.parse(params.pass_params)
         externalUserId = passParams.externalUserId || externalAgreementNo
+        sessionId = passParams.sessionId || null
       }
     } catch (e) {}
 
     if (status === 'SIGN_SUCCESS' || status === 'VALID') {
-      agreements.set(externalUserId, {
+      const existingAg = agreements.get(externalUserId)
+      const agData = {
         agreementNo,
         alipayUserId,
         alipayLogonId,
         status: 'active',
         signTime,
-        externalUserId
-      })
-      console.log('Agreement saved:', externalUserId, agreementNo)
+        externalUserId,
+        sessionId: sessionId || (existingAg && existingAg.sessionId) || null
+      }
+      agreements.set(externalUserId, agData)
+      console.log('Agreement saved:', externalUserId, agreementNo, 'session:', sessionId)
+
+      let deductResult = null
+
+      if (sessionId && signSessions.has(sessionId)) {
+        const sess = signSessions.get(sessionId)
+        const sig = sess.signees.find(s => s.externalUserId === externalUserId)
+        if (sig) {
+          sig.agreementNo = agreementNo
+          sig.status = 'active'
+        } else {
+          sess.signees.push({
+            externalUserId,
+            agreementNo,
+            signTime: signTime || new Date().toISOString(),
+            status: 'active'
+          })
+        }
+
+        // 自动代扣：签约成功后立即扣款
+        if (agreementNo && sess.amount && parseFloat(sess.amount) > 0) {
+          try {
+            const deductOrderNo = 'DEDUCT_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)
+            const bizContent = {
+              out_trade_no: deductOrderNo,
+              total_amount: sess.amount,
+              subject: sess.subject || '预授权代扣',
+              product_code: 'CYCLE_PAY',
+              agreement_params: {
+                agreement_no: agreementNo
+              },
+              notify_url: 'https://alipay-mall-backend.onrender.com/api/alipay/notify'
+            }
+            console.log('Auto deduct start:', deductOrderNo, sess.amount)
+            const deductResp = await alipaySdk.exec('alipay.trade.pay', { bizContent })
+            console.log('Auto deduct response:', JSON.stringify(deductResp))
+
+            if (deductResp && deductResp.code === '10000') {
+              deductResult = {
+                success: true,
+                tradeNo: deductResp.trade_no || deductResp.tradeNo,
+                outTradeNo: deductOrderNo,
+                totalAmount: sess.amount
+              }
+              sig.deductStatus = 'success'
+              sig.deductTradeNo = deductResult.tradeNo
+              sig.deductAmount = sess.amount
+              sig.deductTime = new Date().toISOString()
+              orders.set(deductOrderNo, {
+                tradeNo: deductResult.tradeNo,
+                amount: sess.amount,
+                subject: sess.subject,
+                status: 'TRADE_SUCCESS',
+                agreementNo,
+                externalUserId,
+                deductResult
+              })
+              console.log('Auto deduct success:', deductResult.tradeNo)
+            } else {
+              const errMsg = (deductResp && (deductResp.subMsg || deductResp.msg)) || '代扣失败'
+              deductResult = { success: false, errorMsg: errMsg }
+              sig.deductStatus = 'failed'
+              sig.deductError = errMsg
+              console.log('Auto deduct failed:', errMsg)
+            }
+          } catch (deductErr) {
+            console.error('Auto deduct error:', deductErr)
+            sig.deductStatus = 'failed'
+            sig.deductError = deductErr.message || '代扣异常'
+          }
+        }
+
+        signSessions.set(sessionId, sess)
+        console.log('Session signees updated:', sessionId, 'total:', sess.signees.length)
+      }
     } else if (status === 'UNSIGNED' || status === 'INVALID') {
       const existing = agreements.get(externalUserId)
       if (existing) {
@@ -598,6 +829,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  GET  /api/alipay/agreement/query   - Query agreement')
   console.log('  POST /api/alipay/agreement/notify  - Agreement notify')
   console.log('  POST /api/alipay/agreement/deduct  - Deduct payment')
+  console.log('  POST /api/alipay/agreement/session/create - Create sign session')
+  console.log('  GET  /api/alipay/agreement/scan?session= - Scan & sign')
+  console.log('  GET  /api/alipay/agreement/session/:id/signees - List signees')
   console.log('  GET  /api/health         - Health check')
   console.log('')
   console.log('========================================')
