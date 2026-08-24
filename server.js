@@ -302,6 +302,278 @@ app.post('/api/alipay/refund', async (req, res) => {
   }
 })
 
+// ===== 预授权代扣相关接口 =====
+// 文档: https://opendocs.alipay.com/open/00rt4q
+
+// 内存存储签约关系（生产环境应使用数据库）
+const agreements = new Map() // key: externalUserId -> { agreementNo, alipayUserId, alipayLogonId, status, signTime, externalUserId }
+
+// 解析回调参数（支持 form-urlencoded）
+function parseNotifyParams(body) {
+  if (typeof body === 'object') return body
+  if (typeof body !== 'string') return {}
+  const params = {}
+  body.split('&').forEach(pair => {
+    const [k, v] = pair.split('=')
+    if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '')
+  })
+  return params
+}
+
+// 1. 发起签约 POST /api/alipay/agreement/sign
+app.post('/api/alipay/agreement/sign', async (req, res) => {
+  try {
+    const { externalUserId, signValidity, deductPeriod } = req.body || {}
+
+    if (!externalUserId) {
+      return res.status(400).json({ error: 'Missing externalUserId' })
+    }
+
+    const requestNo = 'SIGN_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
+
+    // 周期性代扣签约：alipay.user.agreement.sign
+    const bizContent = {
+      external_agreement_no: externalUserId,
+      external_user_display_name: externalUserId,
+      sign_validity_period: signValidity || '12m',
+      // 商户自定义参数，签约成功回调时带回
+      pass_params: JSON.stringify({ externalUserId, requestNo }),
+      sign_scene: 'INDUSTRY|DEFAULT',
+      access_params: { channel: 'ALIPAYAPP' },
+      personal_product_code: 'CYCLE_PAY_AUTH',
+      // 销售方案：商家可随时发起扣款
+      sales_plan_code: 'PREAUTH'
+    }
+
+    const response = await alipaySdk.exec('alipay.user.agreement.sign', {
+      bizContent
+    })
+
+    console.log('Agreement sign response:', JSON.stringify(response))
+
+    if (response && response.code === '10000' && response.sign_url) {
+      // 临时保存请求记录（签约完成通过 notify 回写）
+      agreements.set(externalUserId, {
+        externalUserId,
+        requestNo,
+        status: 'pending',
+        signTime: new Date().toISOString()
+      })
+
+      res.json({
+        signUrl: response.sign_url,
+        requestNo
+      })
+    } else {
+      res.status(500).json({
+        error: (response && (response.subMsg || response.msg)) || 'Sign agreement failed',
+        code: response ? response.code : undefined
+      })
+    }
+  } catch (error) {
+    console.error('Agreement sign error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// 2. 查询签约状态 GET /api/alipay/agreement/query
+app.get('/api/alipay/agreement/query', async (req, res) => {
+  try {
+    const { externalUserId } = req.query
+
+    if (!externalUserId) {
+      return res.status(400).json({ error: 'Missing externalUserId' })
+    }
+
+    // 先查本地存储
+    const local = agreements.get(externalUserId)
+
+    // 调用支付宝查询接口 alipay.user.agreement.query
+    let response
+    try {
+      response = await alipaySdk.exec('alipay.user.agreement.query', {
+        bizContent: {
+          external_agreement_no: externalUserId
+        }
+      })
+    } catch (e) {
+      console.warn('Alipay agreement query failed, fallback to local:', e.message)
+    }
+
+    console.log('Agreement query response:', JSON.stringify(response))
+
+    // 支付宝返回有协议
+    if (response && response.code === '10000' && response.agreement_no) {
+      const info = {
+        agreementNo: response.agreement_no,
+        alipayUserId: response.alipay_user_id || '',
+        alipayLogonId: response.alipay_logon_id || '',
+        status: response.status === 'VALID' ? 'active' : (response.status === 'INVALID' ? 'stopped' : 'pending'),
+        signTime: response.sign_time || (local && local.signTime) || new Date().toISOString(),
+        expireTime: response.invalid_time || undefined,
+        externalUserId
+      }
+      agreements.set(externalUserId, info)
+      return res.json({ hasAgreement: true, agreementInfo: info })
+    }
+
+    // 支付宝没有，看本地
+    if (local && local.agreementNo) {
+      return res.json({ hasAgreement: true, agreementInfo: local })
+    }
+
+    res.json({ hasAgreement: false })
+  } catch (error) {
+    console.error('Agreement query error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// 3. 签约异步通知 POST /api/alipay/agreement/notify
+app.post('/api/alipay/agreement/notify', (req, res) => {
+  try {
+    const params = parseNotifyParams(req.body)
+    console.log('Agreement notify received:', JSON.stringify(params))
+
+    // 验签
+    const signVerified = alipaySdk.checkNotifySign(params)
+    if (!signVerified) {
+      console.error('Agreement notify sign verification failed')
+      return res.send('failure')
+    }
+
+    // 签约成功通知
+    const status = params.status
+    const agreementNo = params.agreement_no
+    const alipayUserId = params.alipay_user_id
+    const alipayLogonId = params.alipay_logon_id
+    const externalAgreementNo = params.external_agreement_no
+    const signTime = params.sign_time || new Date().toISOString()
+
+    // pass_params 中保存了 externalUserId
+    let externalUserId = externalAgreementNo
+    try {
+      if (params.pass_params) {
+        const passParams = JSON.parse(params.pass_params)
+        externalUserId = passParams.externalUserId || externalAgreementNo
+      }
+    } catch (e) {}
+
+    if (status === 'SIGN_SUCCESS' || status === 'VALID') {
+      agreements.set(externalUserId, {
+        agreementNo,
+        alipayUserId,
+        alipayLogonId,
+        status: 'active',
+        signTime,
+        externalUserId
+      })
+      console.log('Agreement saved:', externalUserId, agreementNo)
+    } else if (status === 'UNSIGNED' || status === 'INVALID') {
+      const existing = agreements.get(externalUserId)
+      if (existing) {
+        existing.status = 'stopped'
+        agreements.set(externalUserId, existing)
+      }
+      console.log('Agreement stopped:', externalUserId)
+    }
+
+    res.send('success')
+  } catch (error) {
+    console.error('Agreement notify error:', error)
+    res.send('failure')
+  }
+})
+
+// 4. 发起代扣 POST /api/alipay/agreement/deduct
+app.post('/api/alipay/agreement/deduct', async (req, res) => {
+  try {
+    const { orderNo, amount, subject, deductDescription } = req.body || {}
+
+    if (!orderNo || !amount) {
+      return res.status(400).json({ error: 'Missing orderNo or amount' })
+    }
+
+    // 先查订单中保存的 agreementNo（订单创建时已绑定）
+    const order = orders.get(orderNo)
+    let agreementNo = order && order.agreementNo
+
+    // 没有则从 externalUserId 关联
+    if (!agreementNo && order && order.externalUserId) {
+      const ag = agreements.get(order.externalUserId)
+      if (ag) agreementNo = ag.agreementNo
+    }
+
+    // 仍然没有，尝试从传入参数获取（兼容前端直接传 agreementNo 的场景）
+    if (!agreementNo) {
+      const { externalUserId } = req.body
+      if (externalUserId) {
+        const ag = agreements.get(externalUserId)
+        if (ag) agreementNo = ag.agreementNo
+      }
+    }
+
+    if (!agreementNo) {
+      return res.status(400).json({
+        success: false,
+        errorMsg: '用户未签约代扣协议'
+      })
+    }
+
+    const totalAmount = parseFloat(amount).toFixed(2)
+
+    // 调用 alipay.trade.pay 完成代扣
+    const bizContent = {
+      out_trade_no: orderNo,
+      total_amount: totalAmount,
+      subject: subject || '代扣付款',
+      product_code: 'CYCLE_PAY',
+      agreement_params: {
+        agreement_no: agreementNo
+      },
+      notify_url: 'https://alipay-mall-backend.onrender.com/api/alipay/notify'
+    }
+
+    if (deductDescription) {
+      bizContent.body = deductDescription
+    }
+
+    const response = await alipaySdk.exec('alipay.trade.pay', {
+      bizContent
+    })
+
+    console.log('Deduct response:', JSON.stringify(response))
+
+    if (response && response.code === '10000') {
+      // 保存订单
+      orders.set(orderNo, {
+        tradeNo: response.trade_no || response.tradeNo,
+        amount: totalAmount,
+        subject: subject || '代扣付款',
+        status: 'TRADE_SUCCESS',
+        agreementNo,
+        paidAt: new Date().toISOString()
+      })
+
+      res.json({
+        success: true,
+        tradeNo: response.trade_no || response.tradeNo,
+        outTradeNo: orderNo,
+        totalAmount
+      })
+    } else {
+      res.json({
+        success: false,
+        errorCode: response && response.subCode,
+        errorMsg: (response && (response.subMsg || response.msg)) || '扣款失败'
+      })
+    }
+  } catch (error) {
+    console.error('Deduct error:', error)
+    res.status(500).json({ success: false, errorMsg: error.message })
+  }
+})
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log('')
   console.log('========================================')
@@ -318,6 +590,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  GET  /api/order/:orderNo - Query local order')
   console.log('  POST /api/alipay/query   - Query alipay order')
   console.log('  POST /api/alipay/refund  - Apply refund')
+  console.log('  POST /api/alipay/agreement/sign   - Sign agreement')
+  console.log('  GET  /api/alipay/agreement/query   - Query agreement')
+  console.log('  POST /api/alipay/agreement/notify  - Agreement notify')
+  console.log('  POST /api/alipay/agreement/deduct  - Deduct payment')
   console.log('  GET  /api/health         - Health check')
   console.log('')
   console.log('========================================')
