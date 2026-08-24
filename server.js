@@ -323,7 +323,7 @@ function parseNotifyParams(body) {
 // 1. 发起签约 POST /api/alipay/agreement/sign
 app.post('/api/alipay/agreement/sign', async (req, res) => {
   try {
-    const { externalUserId, signValidity, deductPeriod } = req.body || {}
+    const { externalUserId, signValidity, deductPeriod, industry } = req.body || {}
 
     if (!externalUserId) {
       return res.status(400).json({ error: 'Missing externalUserId' })
@@ -331,14 +331,18 @@ app.post('/api/alipay/agreement/sign', async (req, res) => {
 
     const requestNo = 'SIGN_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
 
+    // 准入行业，对应 sign_scene 参数，格式 INDUSTRY|XXX
+    const industryCode = industry || 'DEFAULT'
+    const signScene = `INDUSTRY|${industryCode}`
+
     // 周期性代扣签约：alipay.user.agreement.sign
     const bizContent = {
       external_agreement_no: externalUserId,
       external_user_display_name: externalUserId,
       sign_validity_period: signValidity || '12m',
       // 商户自定义参数，签约成功回调时带回
-      pass_params: JSON.stringify({ externalUserId, requestNo }),
-      sign_scene: 'INDUSTRY|DEFAULT',
+      pass_params: JSON.stringify({ externalUserId, requestNo, industry: industryCode }),
+      sign_scene: signScene,
       access_params: { channel: 'ALIPAYAPP' },
       personal_product_code: 'CYCLE_PAY_AUTH',
       // 销售方案：商家可随时发起扣款
