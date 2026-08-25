@@ -117,7 +117,7 @@ const PORT = process.env.PORT || 3000
 
 function requireSdk(res) {
   if (!alipaySdk) {
-    res.status(500).json({ error: '鏀粯鏈嶅姟鏈垵濮嬪寲锛岃妫€鏌ュ瘑閽ラ厤缃? })
+    res.status(500).json({ error: '支付服务未初始化，请检查密钥配置' })
     return false
   }
   return true
@@ -256,7 +256,7 @@ app.post('/api/alipay/create', async (req, res) => {
     if (!orderNo || !amount) {
       return res.status(400).json({ error: 'Missing orderNo or amount' })
     }
-    const orderSubject = subject || '鍟嗗搧璐拱'
+    const orderSubject = subject || '商品购买'
     const totalAmount = parseFloat(amount).toFixed(2)
     const bizContent = {
       out_trade_no: orderNo,
@@ -416,7 +416,7 @@ app.post('/api/alipay/agreement/sign', async (req, res) => {
       external_user_id: externalUserId,
       product_code: 'CYCLE_PAY_AUTH',
       sign_scene: signScene || 'INDUSTRY',
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       industry: industry || 'DEFAULT'
     }
     if (amount) {
@@ -486,7 +486,7 @@ app.post('/api/alipay/agreement/deduct', async (req, res) => {
     const bizContent = {
       out_trade_no: tradeNo,
       total_amount: parseFloat(amount).toFixed(2),
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       product_code: 'CYCLE_PAY_AUTH',
       agreement_params: {
         agreement_no: agreementNo
@@ -569,7 +569,7 @@ app.post('/api/alipay/agreement/notify', async (req, res) => {
               signee.deductTime = new Date().toISOString()
             } else {
               signee.deductStatus = 'failed'
-              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '浠ｆ墸澶辫触'
+              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '代扣失败'
             }
           }
         } catch (deductErr) {
@@ -600,7 +600,7 @@ app.post('/api/alipay/agreement/session/create', (req, res) => {
     const sessionId = 'SES_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
     const session = {
       id: sessionId,
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       amount: amount || '0.00',
       industry: industry || 'DEFAULT',
       signees: [],
@@ -629,7 +629,7 @@ app.get('/api/alipay/agreement/scan', async (req, res) => {
     if (!requireSdk(res)) return
     const sessionId = req.query.session
     if (!sessionId || !signSessions.has(sessionId)) {
-      return res.status(400).send('鏃犳晥鐨勭绾︿細璇?)
+      return res.status(400).send('无效的签约会话')
     }
     const session = signSessions.get(sessionId)
     const externalUserId = 'USER_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)
@@ -662,7 +662,7 @@ app.get('/api/alipay/agreement/scan', async (req, res) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>棰勬巿鏉冪绾?/title>
+  <title>预授权签约</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; background: #f5f5f5; }
     .card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 320px; width: 100%; }
@@ -685,23 +685,23 @@ app.get('/api/alipay/agreement/scan', async (req, res) => {
         <path d="M12 12v10" stroke="#fff" stroke-width="2"/>
       </svg>
     </div>
-    <h1>棰勬巿鏉冧唬鎵ｇ绾?/h1>
-    <div class="info">鍟嗗搧锛?{session.subject}</div>
-    <div class="amount">楼${session.amount}</div>
-    <div class="info">绛剧害鍚庡皢鑷姩浠ｆ墸鍒拌处</div>
-    <a href="${signUrl}" class="btn">纭绛剧害骞舵敮浠?/a>
-    <div class="tip">鐐瑰嚮绛剧害鍚庤烦杞敮浠樺疂瀹屾垚绛剧害<br>绛剧害鎴愬姛鍚庡皢鑷姩浠ｆ墸</div>
+    <h1>预授权代扣签约</h1>
+    <div class="info">商品：${session.subject}</div>
+    <div class="amount">¥${session.amount}</div>
+    <div class="info">签约后将自动代扣到账</div>
+    <a href="${signUrl}" class="btn">确认签约并支付</a>
+    <div class="tip">点击签约后跳转支付宝完成签约<br>签约成功后将自动代扣</div>
   </div>
 </body>
 </html>`
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         res.send(html)
       } else {
-        res.status(500).send(`<html><body><h2>绛剧害鍙戣捣澶辫触</h2><p>${signResp ? (signResp.subMsg || signResp.msg) : '鏈煡閿欒'}</p></body></html>`)
+        res.status(500).send(`<html><body><h2>签约发起失败</h2><p>${signResp ? (signResp.subMsg || signResp.msg) : '未知错误'}</p></body></html>`)
       }
     } catch (signErr) {
       console.error('Sign error:', signErr)
-      res.status(500).send(`<html><body><h2>绛剧害鏈嶅姟寮傚父</h2><p>${signErr.message}</p></body></html>`)
+      res.status(500).send(`<html><body><h2>签约服务异常</h2><p>${signErr.message}</p></body></html>`)
     }
   } catch (error) {
     console.error('Scan error:', error)
