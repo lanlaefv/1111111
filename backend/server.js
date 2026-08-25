@@ -42,20 +42,30 @@ function parsePrivateKey(keyStr) {
     console.log('Private key: DER PKCS8 format (parsed OK)')
     return exported
   } catch (e1) {
+    console.log('Private key: PKCS8 DER failed:', e1.message)
     try {
       const keyObj = crypto.createPrivateKey({ key: derBuffer, format: 'der', type: 'pkcs1' })
       const exported = keyObj.export({ type: 'pkcs1', format: 'pem' })
       console.log('Private key: DER PKCS1 format (parsed OK)')
       return exported
     } catch (e2) {
+      console.log('Private key: PKCS1 DER failed:', e2.message)
       try {
         const manualPem = buildPem(clean, 'PRIVATE KEY')
         crypto.createPrivateKey(manualPem)
         console.log('Private key: Manual PEM construction OK')
         return manualPem
       } catch (e3) {
-        console.error('Private key: ALL formats failed:', e1.message)
-        return trimmed
+        console.log('Private key: Manual PEM failed:', e3.message)
+        try {
+          const pubKeyTest = crypto.createPublicKey({ key: derBuffer, format: 'der', type: 'spki' })
+          console.error('Private key: This looks like a PUBLIC key, not a private key!')
+          console.error('Private key: Please check ALIPAY_PRIVATE_KEY env var')
+          return trimmed
+        } catch (e4) {
+          console.error('Private key: ALL formats failed:', e1.message)
+          return trimmed
+        }
       }
     }
   }
