@@ -11,47 +11,86 @@ const APP_ID = process.env.ALIPAY_APP_ID || '2021006185601029'
 const RAW_PRIVATE_KEY = process.env.ALIPAY_PRIVATE_KEY || 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQ56iKMCJfj3YnZrw6WVfLr/DRqagGQZATc3zeuI0TIaBoKOcoAiTJ/kWgwEx9EEqW/fkzRftB/ocqevn3OkGyFPWO8DAJ+ph5aAAPWgu/aFqDf0larrVfJAF3lyGCudYBHNXPVp2lEFRtnaEWyysqcS6NuiaL6k01KsPDsGUZgySlOuqAAKFWhPvJDR9IzF5WAOCZmLlaEgf5CDmmX+WwQMNx0KnIcMIEKeD0ZsSlWj+SLSN7N5hR89Y1EDFwQLDuRzSBt9ucAGFsiKKQf6DU7h91tHYKmlqECAKDHpE9UIZV4Xcsj328jzOZOtgHxbLSBOgT0xhsHKyNRzcqfD4TAgMBAAECggEAO2GuSeGW070O4/JTDO76gt63QJHOPkECuFS6qQCisU58rz75Pikl1fkeR6yB0YcA/Nyiqo1493BncY7VYQ5BQGKuznu93AhMsS373mFFN5ptKDXVXx6MVcgBVsIx91vl1hkhObewRgxXQ3VsJfOIiJ71kbnZXSoz2ioWzZhllJNrm7zG91NU0dhtfnbr1puUTXlQRzNqkUG7K4uxryFQBm6kp03Ksxx+wbALzAK3oP77KC0E2ht3rgP9tb7Lhqm/5Oj+6VmwqaRM//KNEoADj659Lr5TY/QUUhfze05Bb8W8ArbDWPH5q59VCM/opKRv+/t4AjSPAlYfq5MthPPpEQKBgQD9yyDhAwXwE2xGyAdhSTNkvNfBdSrKOawWfhne1g6L6ekhmFa59Y5TmLfB6TgR8jtZYVdz8gsaP6ppSs5ohrVASldcEXLsHk1IFXWPv1Y1xloFAPcaCMEkLQlCwkUi13Q+zoHal4SdyvHlocahBWEwdCTdVnQJeO9+ElzkSUuKCQKBgQDSuJ7wrrUg28tcwRbAKZLcbFpq7CV2PhcyF2LCnA6TeyMG0BWbNyvJu56R7RgVaZs1FN4G1k2npev7x9qQl1mTiTlTk3RN1tEr43EODEBTRhFusP3Ov8xDdgja8fsMOXwyvqWgWf0VRLLbVCiLiuseDtavCzLD0uGEl3ywS8t+OwKBgH22s7ehtrw/8r9w7+7pwpJg1ILYlfSL8slFd20hHR2DJV7lxffhQbn5CPT9oC+LjIhuplIhkAxVgwUa7/lo2Lla2cEaR5HcRK2zK4Oj5IFImmimHMCBm6JeyJqP/o0Oql8+DaaIrUE4OPBlXS1/q6/DqEsXOu1CQWdykx7li4x5AoGAFpz7aYbGJ02PCFgsUdjkSsVR+rF237aQFK8PySSoJ8mKG7wO5YZJK6/3t19DO2EG5+5iWUd8M+aJaY6r9OJZGY0bWs2zKHtKHTSeOEy2Rnl5e3CA/EP27rJnBt/6+ffdTTDKY2fk0fh6XTEt3LO+wY4EGerQutURoIIFPoITx2sCgYEAhKj8FURWy7jtvRq2WIuph7VbcwU8rGl9hJmoXhD4h/F1XvsHYWgawzZcvLdw5/p0+4LQZHqbCovwtYvAM85rce102x2CmG9r0xR6kQ/ebf7jM05/oln5Z7Go4vIy8NC5nrM+4i9cJosEwR9vrCNncRrw4JFMZLVB/ZYabNC9P78='
 const RAW_PUBLIC_KEY = process.env.ALIPAY_PUBLIC_KEY || 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm2m+Wk3RjmpMM5E6ArDUGxHAboBRyEzttvUFD2m8cyGabuvulSf0oHu+3NZYWk9Mtmb9+QMf3e/v2YfzzoxKp0CUjT9IxvSoT2Ue3oThWi1BFOS7tuy+Wcr/lvtU5ZC8+LcTFw+8WEC4VL6FDzPXgdytEOW84SN3EgKs1wvqx7+5fs0h+YQBAxme6kiQAyVwTnx67SxcAG7uh4oxYsfDI7kffyNSFY0JWLq6CLBIcTcbMaJgYQRClcH3z0miUBG0cOQ5oopD1LvZV6us1tTzpyq3Dc4n9P81zHBNxVWBray+nC2QuFIvnfyTsS7WlANFCR92vMDRzjASTY/GoPjJJQIDAQAB'
 
+function buildPem(base64Body, label) {
+  let result = '-----BEGIN ' + label + '-----\n'
+  const clean = base64Body.replace(/\s/g, '')
+  for (let i = 0; i < clean.length; i += 64) {
+    result += clean.substring(i, i + 64) + '\n'
+  }
+  result += '-----END ' + label + '-----\n'
+  return result
+}
+
 function parsePrivateKey(keyStr) {
   if (!keyStr) return keyStr
-  try {
-    if (keyStr.includes('PRIVATE KEY')) {
-      const pem = keyStr.replace(/\\n/g, '\n').trim()
-      const keyObj = crypto.createPrivateKey(pem)
-      const exported = keyObj.export({ type: 'pkcs8', format: 'pem' })
-      console.log('Private key parsed from PEM OK')
-      return exported
+  const trimmed = keyStr.trim()
+  if (trimmed.includes('PRIVATE KEY')) {
+    const pem = trimmed.replace(/\\n/g, '\n')
+    try {
+      crypto.createPrivateKey(pem)
+      console.log('Private key: PEM format (verified)')
+      return pem
+    } catch (e) {
+      console.log('Private key: PEM parse failed, trying other formats...')
     }
-    const base64Clean = keyStr.replace(/\s/g, '')
-    const derBuffer = Buffer.from(base64Clean, 'base64')
+  }
+  const clean = trimmed.replace(/\s/g, '')
+  const derBuffer = Buffer.from(clean, 'base64')
+  try {
     const keyObj = crypto.createPrivateKey({ key: derBuffer, format: 'der', type: 'pkcs8' })
     const exported = keyObj.export({ type: 'pkcs8', format: 'pem' })
-    console.log('Private key parsed from DER OK')
+    console.log('Private key: DER PKCS8 format (parsed OK)')
     return exported
-  } catch (e) {
-    console.error('Private key parse failed:', e.message)
-    return keyStr.replace(/\\n/g, '\n').trim()
+  } catch (e1) {
+    try {
+      const keyObj = crypto.createPrivateKey({ key: derBuffer, format: 'der', type: 'pkcs1' })
+      const exported = keyObj.export({ type: 'pkcs1', format: 'pem' })
+      console.log('Private key: DER PKCS1 format (parsed OK)')
+      return exported
+    } catch (e2) {
+      try {
+        const manualPem = buildPem(clean, 'PRIVATE KEY')
+        crypto.createPrivateKey(manualPem)
+        console.log('Private key: Manual PEM construction OK')
+        return manualPem
+      } catch (e3) {
+        console.error('Private key: ALL formats failed:', e1.message)
+        return trimmed
+      }
+    }
   }
 }
 
 function parsePublicKey(keyStr) {
   if (!keyStr) return keyStr
-  try {
-    if (keyStr.includes('PUBLIC KEY')) {
-      const pem = keyStr.replace(/\\n/g, '\n').trim()
-      const keyObj = crypto.createPublicKey(pem)
-      const exported = keyObj.export({ type: 'spki', format: 'pem' })
-      console.log('Public key parsed from PEM OK')
-      return exported
+  const trimmed = keyStr.trim()
+  if (trimmed.includes('PUBLIC KEY')) {
+    const pem = trimmed.replace(/\\n/g, '\n')
+    try {
+      crypto.createPublicKey(pem)
+      console.log('Public key: PEM format (verified)')
+      return pem
+    } catch (e) {
+      console.log('Public key: PEM parse failed, trying other formats...')
     }
-    const base64Clean = keyStr.replace(/\s/g, '')
-    const derBuffer = Buffer.from(base64Clean, 'base64')
+  }
+  const clean = trimmed.replace(/\s/g, '')
+  const derBuffer = Buffer.from(clean, 'base64')
+  try {
     const keyObj = crypto.createPublicKey({ key: derBuffer, format: 'der', type: 'spki' })
     const exported = keyObj.export({ type: 'spki', format: 'pem' })
-    console.log('Public key parsed from DER OK')
+    console.log('Public key: DER SPKI format (parsed OK)')
     return exported
-  } catch (e) {
-    console.error('Public key parse failed:', e.message)
-    return keyStr.replace(/\\n/g, '\n').trim()
+  } catch (e1) {
+    try {
+      const manualPem = buildPem(clean, 'PUBLIC KEY')
+      crypto.createPublicKey(manualPem)
+      console.log('Public key: Manual PEM construction OK')
+      return manualPem
+    } catch (e2) {
+      console.error('Public key: ALL formats failed:', e1.message)
+      return trimmed
+    }
   }
 }
 
@@ -61,49 +100,93 @@ console.log('PRIVATE_KEY source:', process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'def
 console.log('PUBLIC_KEY source:', process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default')
 console.log('PRIVATE_KEY length:', RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0)
 console.log('PUBLIC_KEY length:', RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0)
-console.log('PRIVATE_KEY preview:', RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.substring(0, 20) + '...' : 'empty')
-console.log('PUBLIC_KEY preview:', RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.substring(0, 20) + '...' : 'empty')
-console.log('PRIVATE_KEY contains PRIVATE KEY:', RAW_PRIVATE_KEY && RAW_PRIVATE_KEY.includes('PRIVATE KEY'))
-console.log('PUBLIC_KEY contains PUBLIC KEY:', RAW_PUBLIC_KEY && RAW_PUBLIC_KEY.includes('PUBLIC KEY'))
+console.log('PRIVATE_KEY has PEM header:', RAW_PRIVATE_KEY && RAW_PRIVATE_KEY.includes('PRIVATE KEY'))
+console.log('PUBLIC_KEY has PEM header:', RAW_PUBLIC_KEY && RAW_PUBLIC_KEY.includes('PUBLIC KEY'))
 
 const PRIVATE_KEY = parsePrivateKey(RAW_PRIVATE_KEY)
 const PUBLIC_KEY = parsePublicKey(RAW_PUBLIC_KEY)
 
-console.log('Parsed PRIVATE_KEY starts with:', PRIVATE_KEY ? PRIVATE_KEY.substring(0, 30) + '...' : 'empty')
-console.log('Parsed PUBLIC_KEY starts with:', PUBLIC_KEY ? PUBLIC_KEY.substring(0, 30) + '...' : 'empty')
+console.log('Parsed PRIVATE_KEY starts with:', PRIVATE_KEY ? PRIVATE_KEY.substring(0, 40).replace(/\n/g, '\\n') : 'empty')
+console.log('Parsed PUBLIC_KEY starts with:', PUBLIC_KEY ? PUBLIC_KEY.substring(0, 40).replace(/\n/g, '\\n') : 'empty')
+console.log('PRIVATE_KEY valid format:', PRIVATE_KEY && PRIVATE_KEY.startsWith('-----BEGIN'))
+console.log('PUBLIC_KEY valid format:', PUBLIC_KEY && PUBLIC_KEY.startsWith('-----BEGIN'))
 console.log('====================')
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
+function requireSdk(res) {
+  if (!alipaySdk) {
+    res.status(500).json({ error: '支付服务未初始化，请检查密钥配置' })
+    return false
+  }
+  return true
+}
+
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-const alipaySdk = new AlipaySdk({
-  appId: APP_ID,
-  privateKey: PRIVATE_KEY,
-  alipayPublicKey: PUBLIC_KEY,
-  gateway: 'https://openapi.alipay.com/gateway.do',
-  signType: 'RSA2',
-  keyType: 'PKCS8',
-  charset: 'utf-8'
-})
+let alipaySdk
+try {
+  alipaySdk = new AlipaySdk({
+    appId: APP_ID,
+    privateKey: PRIVATE_KEY,
+    alipayPublicKey: PUBLIC_KEY,
+    gateway: 'https://openapi.alipay.com/gateway.do',
+    signType: 'RSA2',
+    keyType: 'PKCS8',
+    charset: 'utf-8'
+  })
+  console.log('AlipaySdk initialized OK')
+} catch (e) {
+  console.error('AlipaySdk init FAILED:', e.message)
+  alipaySdk = null
+}
 
 app.get('/api/diagnose', (req, res) => {
+  const sdkOk = alipaySdk !== null
+  let sdkTest = null
+  if (sdkOk) {
+    try {
+      const sign = alipaySdk.exec('alipay.trade.query', {
+        outTradeNo: 'TEST_' + Date.now()
+      })
+      sdkTest = { async: true, note: 'Test call initiated (expected to fail with trade not found)' }
+    } catch (e) {
+      sdkTest = { error: e.message }
+    }
+  }
   res.json({
     appId: APP_ID,
+    sdkInitialized: sdkOk,
+    sdkTest: sdkTest,
     privateKeySource: process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'default',
     publicKeySource: process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default',
     privateKeyLength: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0,
     publicKeyLength: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0,
     privateKeyHasPemHeader: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.includes('PRIVATE KEY') : false,
     publicKeyHasPemHeader: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.includes('PUBLIC KEY') : false,
-    privateKeyParsed: PRIVATE_KEY ? PRIVATE_KEY.startsWith('-----') : false,
-    publicKeyParsed: PUBLIC_KEY ? PUBLIC_KEY.startsWith('-----') : false,
-    privateKeyPreview: PRIVATE_KEY ? PRIVATE_KEY.substring(0, 50) + '...' : 'empty',
-    publicKeyPreview: PUBLIC_KEY ? PUBLIC_KEY.substring(0, 50) + '...' : 'empty'
+    privateKeyValidFormat: PRIVATE_KEY ? PRIVATE_KEY.startsWith('-----BEGIN') : false,
+    publicKeyValidFormat: PUBLIC_KEY ? PUBLIC_KEY.startsWith('-----BEGIN') : false,
+    privateKeyFirstLine: PRIVATE_KEY ? PRIVATE_KEY.split('\n')[0] : 'empty',
+    publicKeyFirstLine: PUBLIC_KEY ? PUBLIC_KEY.split('\n')[0] : 'empty',
+    baseUrl: BASE_URL
   })
+})
+
+app.get('/api/test-sdk', async (req, res) => {
+  if (!alipaySdk) {
+    return res.status(500).json({ error: 'SDK not initialized' })
+  }
+  try {
+    const result = await alipaySdk.exec('alipay.trade.query', {
+      outTradeNo: 'TEST_' + Date.now()
+    })
+    res.json({ success: true, result })
+  } catch (e) {
+    res.json({ success: false, error: e.message, code: e.code, stack: e.stack ? e.stack.substring(0, 300) : undefined })
+  }
 })
 
 const orders = new Map()
@@ -168,11 +251,12 @@ app.post('/api/alipay/auth', async (req, res) => {
 
 app.post('/api/alipay/create', async (req, res) => {
   try {
+    if (!requireSdk(res)) return
     const { orderNo, amount, subject, buyerOpenId } = req.body
     if (!orderNo || !amount) {
       return res.status(400).json({ error: 'Missing orderNo or amount' })
     }
-    const orderSubject = subject || '鍟嗗搧璐拱'
+    const orderSubject = subject || '商品购买'
     const totalAmount = parseFloat(amount).toFixed(2)
     const bizContent = {
       out_trade_no: orderNo,
@@ -323,7 +407,8 @@ app.post('/api/alipay/refund', async (req, res) => {
 
 app.post('/api/alipay/agreement/sign', async (req, res) => {
   try {
-    const { externalUserId, signScene, subject, amount, industry } = req.body
+    if (!requireSdk(res)) return
+    const { externalUserId, subject, amount, signScene, industry } = req.body
     if (!externalUserId) {
       return res.status(400).json({ error: 'Missing externalUserId' })
     }
@@ -331,7 +416,7 @@ app.post('/api/alipay/agreement/sign', async (req, res) => {
       external_user_id: externalUserId,
       product_code: 'CYCLE_PAY_AUTH',
       sign_scene: signScene || 'INDUSTRY',
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       industry: industry || 'DEFAULT'
     }
     if (amount) {
@@ -392,6 +477,7 @@ app.post('/api/alipay/agreement/query', async (req, res) => {
 
 app.post('/api/alipay/agreement/deduct', async (req, res) => {
   try {
+    if (!requireSdk(res)) return
     const { agreementNo, amount, subject, outTradeNo } = req.body
     if (!agreementNo || !amount) {
       return res.status(400).json({ error: 'Missing agreementNo or amount' })
@@ -400,7 +486,7 @@ app.post('/api/alipay/agreement/deduct', async (req, res) => {
     const bizContent = {
       out_trade_no: tradeNo,
       total_amount: parseFloat(amount).toFixed(2),
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       product_code: 'CYCLE_PAY_AUTH',
       agreement_params: {
         agreement_no: agreementNo
@@ -483,7 +569,7 @@ app.post('/api/alipay/agreement/notify', async (req, res) => {
               signee.deductTime = new Date().toISOString()
             } else {
               signee.deductStatus = 'failed'
-              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '浠ｆ墸澶辫触'
+              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '代扣失败'
             }
           }
         } catch (deductErr) {
@@ -514,7 +600,7 @@ app.post('/api/alipay/agreement/session/create', (req, res) => {
     const sessionId = 'SES_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
     const session = {
       id: sessionId,
-      subject: subject || '棰勬巿鏉冧唬鎵?,
+      subject: subject || '预授权代扣',
       amount: amount || '0.00',
       industry: industry || 'DEFAULT',
       signees: [],
@@ -540,9 +626,10 @@ app.post('/api/alipay/agreement/session/create', (req, res) => {
 
 app.get('/api/alipay/agreement/scan', async (req, res) => {
   try {
+    if (!requireSdk(res)) return
     const sessionId = req.query.session
     if (!sessionId || !signSessions.has(sessionId)) {
-      return res.status(400).send('鏃犳晥鐨勭绾︿細璇?)
+      return res.status(400).send('无效的签约会话')
     }
     const session = signSessions.get(sessionId)
     const externalUserId = 'USER_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)
@@ -575,7 +662,7 @@ app.get('/api/alipay/agreement/scan', async (req, res) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>棰勬巿鏉冪绾?/title>
+  <title>预授权签约</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; background: #f5f5f5; }
     .card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 320px; width: 100%; }
@@ -598,23 +685,23 @@ app.get('/api/alipay/agreement/scan', async (req, res) => {
         <path d="M12 12v10" stroke="#fff" stroke-width="2"/>
       </svg>
     </div>
-    <h1>棰勬巿鏉冧唬鎵ｇ绾?/h1>
-    <div class="info">鍟嗗搧锛?{session.subject}</div>
-    <div class="amount">楼${session.amount}</div>
-    <div class="info">绛剧害鍚庡皢鑷姩浠ｆ墸鍒拌处</div>
-    <a href="${signUrl}" class="btn">纭绛剧害骞舵敮浠?/a>
-    <div class="tip">鐐瑰嚮绛剧害鍚庤烦杞敮浠樺疂瀹屾垚绛剧害<br>绛剧害鎴愬姛鍚庡皢鑷姩浠ｆ墸</div>
+    <h1>预授权代扣签约</h1>
+    <div class="info">商品：${session.subject}</div>
+    <div class="amount">¥${session.amount}</div>
+    <div class="info">签约后将自动代扣到账</div>
+    <a href="${signUrl}" class="btn">确认签约并支付</a>
+    <div class="tip">点击签约后跳转支付宝完成签约<br>签约成功后将自动代扣</div>
   </div>
 </body>
 </html>`
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         res.send(html)
       } else {
-        res.status(500).send(`<html><body><h2>绛剧害鍙戣捣澶辫触</h2><p>${signResp ? (signResp.subMsg || signResp.msg) : '鏈煡閿欒'}</p></body></html>`)
+        res.status(500).send(`<html><body><h2>签约发起失败</h2><p>${signResp ? (signResp.subMsg || signResp.msg) : '未知错误'}</p></body></html>`)
       }
     } catch (signErr) {
       console.error('Sign error:', signErr)
-      res.status(500).send(`<html><body><h2>绛剧害鏈嶅姟寮傚父</h2><p>${signErr.message}</p></body></html>`)
+      res.status(500).send(`<html><body><h2>签约服务异常</h2><p>${signErr.message}</p></body></html>`)
     }
   } catch (error) {
     console.error('Scan error:', error)
