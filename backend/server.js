@@ -1,19 +1,17 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const https = require('https')
-const fs = require('fs')
-const path = require('path')
-const AlipaySdk = require('alipay-sdk').default
 const crypto = require('crypto')
+const AlipaySdk = require('alipay-sdk').default
 
 const APP_ID = process.env.ALIPAY_APP_ID || '2021006185601029'
-const RAW_PRIVATE_KEY = process.env.ALIPAY_PRIVATE_KEY || 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQ56iKMCJfj3YnZrw6WVfLr/DRqagGQZATc3zeuI0TIaBoKOcoAiTJ/kWgwEx9EEqW/fkzRftB/ocqevn3OkGyFPWO8DAJ+ph5aAAPWgu/aFqDf0larrVfJAF3lyGCudYBHNXPVp2lEFRtnaEWyysqcS6NuiaL6k01KsPDsGUZgySlOuqAAKFWhPvJDR9IzF5WAOCZmLlaEgf5CDmmX+WwQMNx0KnIcMIEKeD0ZsSlWj+SLSN7N5hR89Y1EDFwQLDuRzSBt9ucAGFsiKKQf6DU7h91tHYKmlqECAKDHpE9UIZV4Xcsj328jzOZOtgHxbLSBOgT0xhsHKyNRzcqfD4TAgMBAAECggEAO2GuSeGW070O4/JTDO76gt63QJHOPkECuFS6qQCisU58rz75Pikl1fkeR6yB0YcA/Nyiqo1493BncY7VYQ5BQGKuznu93AhMsS373mFFN5ptKDXVXx6MVcgBVsIx91vl1hkhObewRgxXQ3VsJfOIiJ71kbnZXSoz2ioWzZhllJNrm7zG91NU0dhtfnbr1puUTXlQRzNqkUG7K4uxryFQBm6kp03Ksxx+wbALzAK3oP77KC0E2ht3rgP9tb7Lhqm/5Oj+6VmwqaRM//KNEoADj659Lr5TY/QUUhfze05Bb8W8ArbDWPH5q59VCM/opKRv+/t4AjSPAlYfq5MthPPpEQKBgQD9yyDhAwXwE2xGyAdhSTNkvNfBdSrKOawWfhne1g6L6ekhmFa59Y5TmLfB6TgR8jtZYVdz8gsaP6ppSs5ohrVASldcEXLsHk1IFXWPv1Y1xloFAPcaCMEkLQlCwkUi13Q+zoHal4SdyvHlocahBWEwdCTdVnQJeO9+ElzkSUuKCQKBgQDSuJ7wrrUg28tcwRbAKZLcbFpq7CV2PhcyF2LCnA6TeyMG0BWbNyvJu56R7RgVaZs1FN4G1k2npev7x9qQl1mTiTlTk3RN1tEr43EODEBTRhFusP3Ov8xDdgja8fsMOXwyvqWgWf0VRLLbVCiLiuseDtavCzLD0uGEl3ywS8t+OwKBgH22s7ehtrw/8r9w7+7pwpJg1ILYlfSL8slFd20hHR2DJV7lxffhQbn5CPT9oC+LjIhuplIhkAxVgwUa7/lo2Lla2cEaR5HcRK2zK4Oj5IFImmimHMCBm6JeyJqP/o0Oql8+DaaIrUE4OPBlXS1/q6/DqEsXOu1CQWdykx7li4x5AoGAFpz7aYbGJ02PCFgsUdjkSsVR+rF237aQFK8PySSoJ8mKG7wO5YZJK6/3t19DO2EG5+5iWUd8M+aJaY6r9OJZGY0bWs2zKHtKHTSeOEy2Rnl5e3CA/EP27rJnBt/6+ffdTTDKY2fk0fh6XTEt3LO+wY4EGerQutURoIIFPoITx2sCgYEAhKj8FURWy7jtvRq2WIuph7VbcwU8rGl9hJmoXhD4h/F1XvsHYWgawzZcvLdw5/p0+4LQZHqbCovwtYvAM85rce102x2CmG9r0xR6kQ/ebf7jM05/oln5Z7Go4vIy8NC5nrM+4i9cJosEwR9vrCNncRrw4JFMZLVB/ZYabNC9P78='
-const RAW_PUBLIC_KEY = process.env.ALIPAY_PUBLIC_KEY || 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm2m+Wk3RjmpMM5E6ArDUGxHAboBRyEzttvUFD2m8cyGabuvulSf0oHu+3NZYWk9Mtmb9+QMf3e/v2YfzzoxKp0CUjT9IxvSoT2Ue3oThWi1BFOS7tuy+Wcr/lvtU5ZC8+LcTFw+8WEC4VL6FDzPXgdytEOW84SN3EgKs1wvqx7+5fs0h+YQBAxme6kiQAyVwTnx67SxcAG7uh4oxYsfDI7kffyNSFY0JWLq6CLBIcTcbMaJgYQRClcH3z0miUBG0cOQ5oopD1LvZV6us1tTzpyq3Dc4n9P81zHBNxVWBray+nC2QuFIvnfyTsS7WlANFCR92vMDRzjASTY/GoPjJJQIDAQAB'
+const RAW_PRIVATE_KEY = process.env.ALIPAY_PRIVATE_KEY || ''
+const RAW_PUBLIC_KEY = process.env.ALIPAY_PUBLIC_KEY || ''
+const BASE_URL = process.env.BASE_URL || 'https://alipay-mall-backend.onrender.com'
 
-function buildPem(base64Body, label) {
+function buildPem(body, label) {
   let result = '-----BEGIN ' + label + '-----\n'
-  const clean = base64Body.replace(/\s/g, '')
+  const clean = body.replace(/\s/g, '')
   for (let i = 0; i < clean.length; i += 64) {
     result += clean.substring(i, i + 64) + '\n'
   }
@@ -28,10 +26,10 @@ function parsePrivateKey(keyStr) {
     const pem = trimmed.replace(/\\n/g, '\n')
     try {
       crypto.createPrivateKey(pem)
-      console.log('Private key: PEM format (verified)')
+      console.log('[Key] Private key: PEM format OK')
       return pem
     } catch (e) {
-      console.log('Private key: PEM parse failed, trying other formats...')
+      console.log('[Key] PEM parse failed, trying DER...')
     }
   }
   const clean = trimmed.replace(/\s/g, '')
@@ -39,33 +37,28 @@ function parsePrivateKey(keyStr) {
   try {
     const keyObj = crypto.createPrivateKey({ key: derBuffer, format: 'der', type: 'pkcs8' })
     const exported = keyObj.export({ type: 'pkcs8', format: 'pem' })
-    console.log('Private key: DER PKCS8 format (parsed OK)')
+    console.log('[Key] Private key: DER PKCS8 format OK')
     return exported
   } catch (e1) {
-    console.log('Private key: PKCS8 DER failed:', e1.message)
     try {
       const keyObj = crypto.createPrivateKey({ key: derBuffer, format: 'der', type: 'pkcs1' })
       const exported = keyObj.export({ type: 'pkcs1', format: 'pem' })
-      console.log('Private key: DER PKCS1 format (parsed OK)')
+      console.log('[Key] Private key: DER PKCS1 format OK')
       return exported
     } catch (e2) {
-      console.log('Private key: PKCS1 DER failed:', e2.message)
       try {
         const manualPem = buildPem(clean, 'PRIVATE KEY')
         crypto.createPrivateKey(manualPem)
-        console.log('Private key: Manual PEM construction OK')
+        console.log('[Key] Private key: Manual PEM construction OK')
         return manualPem
       } catch (e3) {
-        console.log('Private key: Manual PEM failed:', e3.message)
         try {
-          const pubKeyTest = crypto.createPublicKey({ key: derBuffer, format: 'der', type: 'spki' })
-          console.error('Private key: This looks like a PUBLIC key, not a private key!')
-          console.error('Private key: Please check ALIPAY_PRIVATE_KEY env var')
-          return trimmed
+          crypto.createPublicKey({ key: derBuffer, format: 'der', type: 'spki' })
+          console.error('[Key] ERROR: This looks like a PUBLIC key, not a private key!')
         } catch (e4) {
-          console.error('Private key: ALL formats failed:', e1.message)
-          return trimmed
+          console.error('[Key] ERROR: ALL private key formats failed')
         }
+        return trimmed
       }
     }
   }
@@ -78,10 +71,10 @@ function parsePublicKey(keyStr) {
     const pem = trimmed.replace(/\\n/g, '\n')
     try {
       crypto.createPublicKey(pem)
-      console.log('Public key: PEM format (verified)')
+      console.log('[Key] Public key: PEM format OK')
       return pem
     } catch (e) {
-      console.log('Public key: PEM parse failed, trying other formats...')
+      console.log('[Key] Public key PEM parse failed, trying DER...')
     }
   }
   const clean = trimmed.replace(/\s/g, '')
@@ -89,41 +82,63 @@ function parsePublicKey(keyStr) {
   try {
     const keyObj = crypto.createPublicKey({ key: derBuffer, format: 'der', type: 'spki' })
     const exported = keyObj.export({ type: 'spki', format: 'pem' })
-    console.log('Public key: DER SPKI format (parsed OK)')
+    console.log('[Key] Public key: DER SPKI format OK')
     return exported
   } catch (e1) {
     try {
       const manualPem = buildPem(clean, 'PUBLIC KEY')
       crypto.createPublicKey(manualPem)
-      console.log('Public key: Manual PEM construction OK')
+      console.log('[Key] Public key: Manual PEM construction OK')
       return manualPem
     } catch (e2) {
-      console.error('Public key: ALL formats failed:', e1.message)
+      console.error('[Key] ERROR: ALL public key formats failed')
       return trimmed
     }
   }
 }
 
-console.log('=== Alipay Config ===')
-console.log('APP_ID:', APP_ID)
-console.log('PRIVATE_KEY source:', process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'default')
-console.log('PUBLIC_KEY source:', process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default')
-console.log('PRIVATE_KEY length:', RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0)
-console.log('PUBLIC_KEY length:', RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0)
-console.log('PRIVATE_KEY has PEM header:', RAW_PRIVATE_KEY && RAW_PRIVATE_KEY.includes('PRIVATE KEY'))
-console.log('PUBLIC_KEY has PEM header:', RAW_PUBLIC_KEY && RAW_PUBLIC_KEY.includes('PUBLIC KEY'))
-
 const PRIVATE_KEY = parsePrivateKey(RAW_PRIVATE_KEY)
 const PUBLIC_KEY = parsePublicKey(RAW_PUBLIC_KEY)
 
-console.log('Parsed PRIVATE_KEY starts with:', PRIVATE_KEY ? PRIVATE_KEY.substring(0, 40).replace(/\n/g, '\\n') : 'empty')
-console.log('Parsed PUBLIC_KEY starts with:', PUBLIC_KEY ? PUBLIC_KEY.substring(0, 40).replace(/\n/g, '\\n') : 'empty')
-console.log('PRIVATE_KEY valid format:', PRIVATE_KEY && PRIVATE_KEY.startsWith('-----BEGIN'))
-console.log('PUBLIC_KEY valid format:', PUBLIC_KEY && PUBLIC_KEY.startsWith('-----BEGIN'))
-console.log('====================')
+console.log('========================================')
+console.log('  Alipay Backend Configuration')
+console.log('========================================')
+console.log('  APP_ID:', APP_ID)
+console.log('  PRIVATE_KEY:', RAW_PRIVATE_KEY ? (process.env.ALIPAY_PRIVATE_KEY ? 'from env' : 'from default') : 'NOT SET')
+console.log('  PUBLIC_KEY:', RAW_PUBLIC_KEY ? (process.env.ALIPAY_PUBLIC_KEY ? 'from env' : 'from default') : 'NOT SET')
+console.log('  BASE_URL:', BASE_URL)
+console.log('========================================')
+
+let alipaySdk
+try {
+  if (!PUBLIC_KEY) {
+    console.warn('[WARN] ALIPAY_PUBLIC_KEY is not set!')
+    console.warn('[WARN] Get it from: https://open.alipay.com -> 你的应用 -> 开发配置')
+  }
+  if (!PRIVATE_KEY) {
+    console.error('[ERROR] ALIPAY_PRIVATE_KEY is not set!')
+  }
+  alipaySdk = new AlipaySdk({
+    appId: APP_ID,
+    privateKey: PRIVATE_KEY || '',
+    alipayPublicKey: PUBLIC_KEY || '',
+    gateway: 'https://openapi.alipay.com/gateway.do',
+    signType: 'RSA2',
+    keyType: 'PKCS8',
+    charset: 'utf-8'
+  })
+  console.log('[SDK] Initialized OK')
+} catch (e) {
+  console.error('[SDK] Init FAILED:', e.message)
+  alipaySdk = null
+}
 
 const app = express()
 const PORT = process.env.PORT || 3000
+
+const sessions = new Map()
+const agreements = new Map()
+const orders = new Map()
 
 function requireSdk(res) {
   if (!alipaySdk) {
@@ -133,478 +148,37 @@ function requireSdk(res) {
   return true
 }
 
+function makeExternalUserId() {
+  return 'USER_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
+}
+
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-let alipaySdk
-try {
-  alipaySdk = new AlipaySdk({
-    appId: APP_ID,
-    privateKey: PRIVATE_KEY,
-    alipayPublicKey: PUBLIC_KEY,
-    gateway: 'https://openapi.alipay.com/gateway.do',
-    signType: 'RSA2',
-    keyType: 'PKCS8',
-    charset: 'utf-8'
-  })
-  console.log('AlipaySdk initialized OK')
-} catch (e) {
-  console.error('AlipaySdk init FAILED:', e.message)
-  alipaySdk = null
-}
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString(), sdkReady: !!alipaySdk })
+})
 
 app.get('/api/diagnose', (req, res) => {
-  const sdkOk = alipaySdk !== null
-  let sdkTest = null
-  if (sdkOk) {
-    try {
-      const sign = alipaySdk.exec('alipay.trade.query', {
-        outTradeNo: 'TEST_' + Date.now()
-      })
-      sdkTest = { async: true, note: 'Test call initiated (expected to fail with trade not found)' }
-    } catch (e) {
-      sdkTest = { error: e.message }
-    }
-  }
   res.json({
     appId: APP_ID,
-    sdkInitialized: sdkOk,
-    sdkTest: sdkTest,
-    privateKeySource: process.env.ALIPAY_PRIVATE_KEY ? 'env' : 'default',
-    publicKeySource: process.env.ALIPAY_PUBLIC_KEY ? 'env' : 'default',
-    privateKeyLength: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.length : 0,
-    publicKeyLength: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.length : 0,
-    privateKeyHasPemHeader: RAW_PRIVATE_KEY ? RAW_PRIVATE_KEY.includes('PRIVATE KEY') : false,
-    publicKeyHasPemHeader: RAW_PUBLIC_KEY ? RAW_PUBLIC_KEY.includes('PUBLIC KEY') : false,
-    privateKeyValidFormat: PRIVATE_KEY ? PRIVATE_KEY.startsWith('-----BEGIN') : false,
-    publicKeyValidFormat: PUBLIC_KEY ? PUBLIC_KEY.startsWith('-----BEGIN') : false,
-    privateKeyFirstLine: PRIVATE_KEY ? PRIVATE_KEY.split('\n')[0] : 'empty',
-    publicKeyFirstLine: PUBLIC_KEY ? PUBLIC_KEY.split('\n')[0] : 'empty',
-    baseUrl: BASE_URL
+    baseUrl: BASE_URL,
+    sdkInitialized: !!alipaySdk,
+    privateKeySet: !!RAW_PRIVATE_KEY,
+    publicKeySet: !!RAW_PUBLIC_KEY,
+    privateKeyFormat: PRIVATE_KEY ? (PRIVATE_KEY.startsWith('-----BEGIN') ? 'PEM' : 'unknown') : 'none',
+    publicKeyFormat: PUBLIC_KEY ? (PUBLIC_KEY.startsWith('-----BEGIN') ? 'PEM' : 'unknown') : 'none',
+    envVars: {
+      ALIPAY_APP_ID: process.env.ALIPAY_APP_ID ? 'set' : 'default',
+      ALIPAY_PRIVATE_KEY: process.env.ALIPAY_PRIVATE_KEY ? 'set' : 'default',
+      ALIPAY_PUBLIC_KEY: process.env.ALIPAY_PUBLIC_KEY ? 'set' : 'default',
+      BASE_URL: process.env.BASE_URL ? 'set' : 'default'
+    }
   })
 })
 
-app.get('/api/test-sdk', async (req, res) => {
-  if (!alipaySdk) {
-    return res.status(500).json({ error: 'SDK not initialized' })
-  }
-  try {
-    const result = await alipaySdk.exec('alipay.trade.query', {
-      outTradeNo: 'TEST_' + Date.now()
-    })
-    res.json({ success: true, result })
-  } catch (e) {
-    res.json({ success: false, error: e.message, code: e.code, stack: e.stack ? e.stack.substring(0, 300) : undefined })
-  }
-})
-
-const orders = new Map()
-
-const signSessions = new Map()
-
-let HOST_IP = '192.168.1.106'
-try {
-  const nets = require('os').networkInterfaces()
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      if (net.family === 'IPv4' && !net.internal) {
-        HOST_IP = net.address
-        break
-      }
-    }
-  }
-} catch (e) {}
-
-const certOptions = {}
-const keyPath = path.join(__dirname, 'server.key')
-const certPath = path.join(__dirname, 'server.crt')
-if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
-  certOptions.key = fs.readFileSync(keyPath)
-  certOptions.cert = fs.readFileSync(certPath)
-}
-
-const BASE_URL = process.env.BASE_URL || 'https://alipay-mall-backend.onrender.com'
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() })
-})
-
-app.post('/api/alipay/auth', async (req, res) => {
-  try {
-    const { authCode } = req.body
-    if (!authCode) {
-      return res.status(400).json({ error: 'Missing authCode' })
-    }
-    const response = await alipaySdk.exec('alipay.system.oauth.token', {
-      grantType: 'authorization_code',
-      code: authCode
-    })
-    console.log('OAuth response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({
-        success: true,
-        openId: response.open_id || response.openId,
-        userId: response.user_id || response.userId
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Auth failed'
-      })
-    }
-  } catch (error) {
-    console.error('Auth error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/create', async (req, res) => {
-  try {
-    if (!requireSdk(res)) return
-    const { orderNo, amount, subject, buyerOpenId } = req.body
-    if (!orderNo || !amount) {
-      return res.status(400).json({ error: 'Missing orderNo or amount' })
-    }
-    const orderSubject = subject || '商品购买'
-    const totalAmount = parseFloat(amount).toFixed(2)
-    const bizContent = {
-      out_trade_no: orderNo,
-      total_amount: totalAmount,
-      subject: orderSubject,
-      product_code: 'JSAPI_PAY',
-      timeout_express: '30m',
-      notify_url: 'https://alipay-mall-backend.onrender.com/api/alipay/notify'
-    }
-    if (buyerOpenId) {
-      bizContent.buyer_open_id = buyerOpenId
-    }
-    const response = await alipaySdk.exec('alipay.trade.create', {
-      bizContent: bizContent
-    })
-    console.log('Trade create response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      const tradeNo = response.trade_no || response.tradeNo || ''
-      orders.set(orderNo, {
-        tradeNo,
-        amount: totalAmount,
-        subject: orderSubject,
-        status: 'WAIT_BUYER_PAY',
-        createdAt: new Date().toISOString()
-      })
-      res.json({
-        success: true,
-        tradeNo,
-        orderNo,
-        amount: totalAmount
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Create trade failed',
-        code: response ? response.code : undefined
-      })
-    }
-  } catch (error) {
-    console.error('Create trade error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/notify', (req, res) => {
-  try {
-    const params = req.body
-    if (!params.sign) {
-      return res.json('success')
-    }
-    const signVerified = alipaySdk.checkNotifySign(params)
-    if (!signVerified) {
-      console.error('Sign verification failed')
-      return res.json('failure')
-    }
-    const orderNo = params.out_trade_no
-    const tradeStatus = params.trade_status
-    const tradeNo = params.trade_no
-    const totalAmount = params.total_amount
-    const order = orders.get(orderNo)
-    if (!order) {
-      console.error('Order not found:', orderNo)
-      return res.json('failure')
-    }
-    order.status = tradeStatus
-    order.tradeNo = tradeNo
-    order.paidAt = new Date().toISOString()
-    console.log('Payment notify processed:', { orderNo, tradeStatus, tradeNo, totalAmount })
-    res.json('success')
-  } catch (error) {
-    console.error('Notify error:', error)
-    res.json('failure')
-  }
-})
-
-app.get('/api/order/:orderNo', (req, res) => {
-  const orderNo = req.params.orderNo
-  const order = orders.get(orderNo)
-  if (!order) {
-    return res.status(404).json({ error: 'Order not found' })
-  }
-  res.json({ success: true, order })
-})
-
-app.post('/api/alipay/query', async (req, res) => {
-  try {
-    const { orderNo } = req.body
-    if (!orderNo) {
-      return res.status(400).json({ error: 'Missing orderNo' })
-    }
-    const response = await alipaySdk.exec('alipay.trade.query', {
-      bizContent: { out_trade_no: orderNo }
-    })
-    console.log('Query response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({
-        success: true,
-        status: response.tradeStatus,
-        tradeNo: response.tradeNo,
-        totalAmount: response.totalAmount,
-        buyerLogonId: response.buyerLogonId
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Query failed'
-      })
-    }
-  } catch (error) {
-    console.error('Query error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/refund', async (req, res) => {
-  try {
-    const { orderNo, refundAmount, refundReason } = req.body
-    if (!orderNo || !refundAmount) {
-      return res.status(400).json({ error: 'Missing orderNo or refundAmount' })
-    }
-    const order = orders.get(orderNo)
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' })
-    }
-    const refundNo = 'REFUND_' + Date.now()
-    const response = await alipaySdk.exec('alipay.trade.refund', {
-      bizContent: {
-        out_trade_no: orderNo,
-        refund_amount: parseFloat(refundAmount).toFixed(2),
-        refund_reason: refundReason || 'User requested refund',
-        out_request_no: refundNo
-      }
-    })
-    console.log('Refund response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({ success: true, refundId: response.refundId, refundNo })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Refund failed'
-      })
-    }
-  } catch (error) {
-    console.error('Refund error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/agreement/sign', async (req, res) => {
-  try {
-    if (!requireSdk(res)) return
-    const { externalUserId, subject, amount, signScene, industry } = req.body
-    if (!externalUserId) {
-      return res.status(400).json({ error: 'Missing externalUserId' })
-    }
-    const bizContent = {
-      external_user_id: externalUserId,
-      product_code: 'CYCLE_PAY_AUTH',
-      sign_scene: signScene || 'INDUSTRY',
-      subject: subject || '预授权代扣',
-      industry: industry || 'DEFAULT'
-    }
-    if (amount) {
-      bizContent.amount = amount
-    }
-    const response = await alipaySdk.exec('alipay.user.agreement.sign', {
-      bizContent
-    })
-    console.log('Agreement sign response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({
-        success: true,
-        signUrl: response.sign_url || response.signUrl,
-        agreementNo: response.agreement_no || response.agreementNo,
-        externalUserId
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Agreement sign failed',
-        code: response ? response.code : undefined
-      })
-    }
-  } catch (error) {
-    console.error('Agreement sign error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/agreement/query', async (req, res) => {
-  try {
-    const { agreementNo } = req.body
-    if (!agreementNo) {
-      return res.status(400).json({ error: 'Missing agreementNo' })
-    }
-    const response = await alipaySdk.exec('alipay.user.agreement.query', {
-      bizContent: { agreement_no: agreementNo }
-    })
-    console.log('Agreement query response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({
-        success: true,
-        status: response.status,
-        agreementNo: response.agreement_no || response.agreementNo,
-        externalUserId: response.external_user_id || response.externalUserId
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Agreement query failed'
-      })
-    }
-  } catch (error) {
-    console.error('Agreement query error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/agreement/deduct', async (req, res) => {
-  try {
-    if (!requireSdk(res)) return
-    const { agreementNo, amount, subject, outTradeNo } = req.body
-    if (!agreementNo || !amount) {
-      return res.status(400).json({ error: 'Missing agreementNo or amount' })
-    }
-    const tradeNo = outTradeNo || 'DEDUCT_' + Date.now()
-    const bizContent = {
-      out_trade_no: tradeNo,
-      total_amount: parseFloat(amount).toFixed(2),
-      subject: subject || '预授权代扣',
-      product_code: 'CYCLE_PAY_AUTH',
-      agreement_params: {
-        agreement_no: agreementNo
-      }
-    }
-    const response = await alipaySdk.exec('alipay.trade.pay', {
-      bizContent
-    })
-    console.log('Deduct response:', JSON.stringify(response))
-    if (response && response.code === '10000') {
-      res.json({
-        success: true,
-        tradeNo: response.trade_no || response.tradeNo,
-        outTradeNo: tradeNo,
-        totalAmount: response.total_amount || response.totalAmount,
-        status: response.trade_status || response.tradeStatus
-      })
-    } else {
-      res.status(500).json({
-        success: false,
-        error: (response && (response.subMsg || response.msg)) || 'Deduct failed',
-        code: response ? response.code : undefined
-      })
-    }
-  } catch (error) {
-    console.error('Deduct error:', error)
-    res.status(500).json({ success: false, error: error.message })
-  }
-})
-
-app.post('/api/alipay/agreement/notify', async (req, res) => {
-  try {
-    const params = req.body
-    console.log('Agreement notify received:', JSON.stringify(params))
-    if (!params.sign) {
-      return res.json('success')
-    }
-    const signVerified = alipaySdk.checkNotifySign(params)
-    if (!signVerified) {
-      console.error('Agreement notify sign verification failed')
-      return res.json('failure')
-    }
-    const agreementNo = params.agreement_no
-    const externalUserId = params.external_user_id
-    const status = params.status
-    const sessionId = params.session_id || (params.ext_params && JSON.parse(params.ext_params).sessionId)
-    if (status === 'SIGNED' || status === 'ACTIVATED') {
-      console.log('Agreement signed, attempting auto-deduct...', { agreementNo, externalUserId, sessionId })
-      if (sessionId && signSessions.has(sessionId)) {
-        const session = signSessions.get(sessionId)
-        const existingSignee = session.signees.find(s => s.externalUserId === externalUserId)
-        if (!existingSignee) {
-          session.signees.push({
-            externalUserId,
-            agreementNo,
-            signTime: new Date().toISOString(),
-            status: 'active',
-            deductStatus: 'pending'
-          })
-        }
-        try {
-          const deductBizContent = {
-            out_trade_no: 'DEDUCT_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-            total_amount: session.amount,
-            subject: session.subject,
-            product_code: 'CYCLE_PAY_AUTH',
-            agreement_params: {
-              agreement_no: agreementNo
-            }
-          }
-          console.log('Auto-deduct bizContent:', JSON.stringify(deductBizContent))
-          const deductResp = await alipaySdk.exec('alipay.trade.pay', { bizContent: deductBizContent })
-          console.log('Auto-deduct response:', JSON.stringify(deductResp))
-          const signee = session.signees.find(s => s.externalUserId === externalUserId)
-          if (signee) {
-            if (deductResp && deductResp.code === '10000') {
-              signee.deductStatus = 'success'
-              signee.deductTradeNo = deductResp.trade_no || deductResp.tradeNo
-              signee.deductAmount = session.amount
-              signee.deductTime = new Date().toISOString()
-            } else {
-              signee.deductStatus = 'failed'
-              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '代扣失败'
-            }
-          }
-        } catch (deductErr) {
-          console.error('Auto-deduct error:', deductErr)
-          const signee = session.signees.find(s => s.externalUserId === externalUserId)
-          if (signee) {
-            signee.deductStatus = 'failed'
-            signee.deductError = deductErr.message
-          }
-        }
-        console.log('Session updated:', JSON.stringify({
-          sessionId,
-          signees: session.signees.length,
-          activeCount: session.signees.filter(s => s.deductStatus === 'success').length
-        }))
-      }
-    }
-    res.json('success')
-  } catch (error) {
-    console.error('Agreement notify error:', error)
-    res.json('failure')
-  }
-})
-
-app.post('/api/alipay/agreement/session/create', (req, res) => {
+app.post('/api/session/create', (req, res) => {
   try {
     const { subject, amount, industry } = req.body || {}
     const sessionId = 'SES_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
@@ -616,8 +190,8 @@ app.post('/api/alipay/agreement/session/create', (req, res) => {
       signees: [],
       createdAt: new Date().toISOString()
     }
-    signSessions.set(sessionId, session)
-    const scanUrl = `${BASE_URL}/api/alipay/agreement/scan?session=${sessionId}`
+    sessions.set(sessionId, session)
+    const scanUrl = BASE_URL + '/api/scan?session=' + encodeURIComponent(sessionId)
     res.json({
       sessionId,
       scanUrl,
@@ -634,98 +208,13 @@ app.post('/api/alipay/agreement/session/create', (req, res) => {
   }
 })
 
-app.get('/api/alipay/agreement/scan', async (req, res) => {
-  try {
-    if (!requireSdk(res)) return
-    const sessionId = req.query.session
-    if (!sessionId || !signSessions.has(sessionId)) {
-      return res.status(400).send('无效的签约会话')
-    }
-    const session = signSessions.get(sessionId)
-    const externalUserId = 'USER_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)
-    try {
-      const signBizContent = {
-        external_user_id: externalUserId,
-        product_code: 'CYCLE_PAY_AUTH',
-        sign_scene: 'INDUSTRY',
-        subject: session.subject,
-        industry: session.industry,
-        amount: session.amount,
-        ext_params: JSON.stringify({ sessionId })
-      }
-      const signResp = await alipaySdk.exec('alipay.user.agreement.sign', {
-        bizContent: signBizContent
-      })
-      console.log('Scan sign response:', JSON.stringify(signResp))
-      if (signResp && signResp.code === '10000') {
-        const signee = {
-          externalUserId,
-          agreementNo: signResp.agreement_no || signResp.agreementNo,
-          signTime: new Date().toISOString(),
-          status: 'pending',
-          deductStatus: 'pending'
-        }
-        session.signees.push(signee)
-        const signUrl = signResp.sign_url || signResp.signUrl
-        const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>预授权签约</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; background: #f5f5f5; }
-    .card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 320px; width: 100%; }
-    .icon { width: 64px; height: 64px; background: #1677FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-    .icon svg { width: 32px; height: 32px; }
-    h1 { font-size: 18px; margin: 0 0 10px; color: #333; }
-    .info { font-size: 14px; color: #666; margin: 8px 0; }
-    .amount { font-size: 28px; font-weight: bold; color: #FF4D4F; margin: 15px 0; }
-    .btn { display: block; width: 100%; padding: 14px; background: #1677FF; color: #fff; border: none; border-radius: 8px; font-size: 16px; margin-top: 20px; text-decoration: none; text-align: center; box-sizing: border-box; }
-    .btn:active { background: #0958D9; }
-    .tip { font-size: 12px; color: #999; margin-top: 15px; line-height: 1.5; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M2 7l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M12 12v10" stroke="#fff" stroke-width="2"/>
-      </svg>
-    </div>
-    <h1>预授权代扣签约</h1>
-    <div class="info">商品：${session.subject}</div>
-    <div class="amount">¥${session.amount}</div>
-    <div class="info">签约后将自动代扣到账</div>
-    <a href="${signUrl}" class="btn">确认签约并支付</a>
-    <div class="tip">点击签约后跳转支付宝完成签约<br>签约成功后将自动代扣</div>
-  </div>
-</body>
-</html>`
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        res.send(html)
-      } else {
-        res.status(500).send(`<html><body><h2>签约发起失败</h2><p>${signResp ? (signResp.subMsg || signResp.msg) : '未知错误'}</p></body></html>`)
-      }
-    } catch (signErr) {
-      console.error('Sign error:', signErr)
-      res.status(500).send(`<html><body><h2>签约服务异常</h2><p>${signErr.message}</p></body></html>`)
-    }
-  } catch (error) {
-    console.error('Scan error:', error)
-    res.status(500).send('Internal Server Error')
-  }
-})
-
-app.get('/api/alipay/agreement/session/:sessionId/signees', (req, res) => {
+app.get('/api/session/:sessionId/signees', (req, res) => {
   try {
     const sessionId = req.params.sessionId
-    if (!signSessions.has(sessionId)) {
+    if (!sessions.has(sessionId)) {
       return res.status(404).json({ error: 'Session not found' })
     }
-    const session = signSessions.get(sessionId)
+    const session = sessions.get(sessionId)
     res.json({
       sessionId,
       sessionInfo: {
@@ -753,6 +242,440 @@ app.get('/api/alipay/agreement/session/:sessionId/signees', (req, res) => {
   }
 })
 
+app.get('/api/scan', async (req, res) => {
+  try {
+    if (!requireSdk(res)) return
+    const sessionId = req.query.session
+    if (!sessionId || !sessions.has(sessionId)) {
+      return res.status(400).send('无效的签约会话')
+    }
+    const session = sessions.get(sessionId)
+    const externalUserId = makeExternalUserId()
+    try {
+      const signResp = await alipaySdk.exec('alipay.user.agreement.sign', {
+        bizContent: {
+          external_user_id: externalUserId,
+          product_code: 'CYCLE_PAY_AUTH',
+          sign_scene: 'INDUSTRY',
+          subject: session.subject,
+          industry: session.industry,
+          amount: session.amount,
+          ext_params: JSON.stringify({ sessionId })
+        }
+      })
+      console.log('[Scan] Sign response:', JSON.stringify(signResp))
+      if (signResp && signResp.code === '10000') {
+        const signee = {
+          externalUserId,
+          agreementNo: signResp.agreement_no || signResp.agreementNo || null,
+          signTime: new Date().toISOString(),
+          status: 'pending',
+          deductStatus: 'pending'
+        }
+        session.signees.push(signee)
+        const signUrl = signResp.sign_url || signResp.signUrl
+        const html = buildScanHtml(session, signUrl)
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.send(html)
+      } else {
+        const msg = (signResp && (signResp.subMsg || signResp.msg)) || '签约发起失败'
+        res.status(500).send(buildErrorHtml('签约发起失败', msg))
+      }
+    } catch (signErr) {
+      console.error('[Scan] Sign error:', signErr)
+      res.status(500).send(buildErrorHtml('签约服务异常', signErr.message))
+    }
+  } catch (error) {
+    console.error('[Scan] Error:', error)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
+function buildScanHtml(session, signUrl) {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>预授权签约</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: #f5f5f5; }
+    .card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 320px; width: 100%; }
+    .icon { width: 64px; height: 64px; background: #1677FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    h1 { font-size: 18px; margin: 0 0 10px; color: #333; }
+    .info { font-size: 14px; color: #666; margin: 8px 0; }
+    .amount { font-size: 28px; font-weight: bold; color: #FF4D4F; margin: 15px 0; }
+    .btn { display: block; width: 100%; padding: 14px; background: #1677FF; color: #fff; border: none; border-radius: 8px; font-size: 16px; margin-top: 20px; text-decoration: none; text-align: center; }
+    .tip { font-size: 12px; color: #999; margin-top: 15px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M2 7l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 12v10" stroke="#fff" stroke-width="2"/>
+      </svg>
+    </div>
+    <h1>预授权代扣签约</h1>
+    <div class="info">商品：${session.subject}</div>
+    <div class="amount">¥${session.amount}</div>
+    <div class="info">签约后将自动代扣到账</div>
+    <a href="${signUrl}" class="btn">确认签约并支付</a>
+    <div class="tip">点击签约后跳转支付宝完成签约<br>签约成功后将自动代扣</div>
+  </div>
+</body>
+</html>`
+}
+
+function buildErrorHtml(title, message) {
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${title}</title>
+<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f5f5f5}.card{background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08);text-align:center;max-width:320px}h2{color:#333;margin-bottom:10px}p{color:#666}</style>
+</head><body><div class="card"><h2>${title}</h2><p>${message}</p></div></body></html>`
+}
+
+app.post('/api/agreement/sign', async (req, res) => {
+  try {
+    if (!requireSdk(res)) return
+    const { externalUserId, subject, amount, industry } = req.body
+    if (!externalUserId) {
+      return res.status(400).json({ error: 'Missing externalUserId' })
+    }
+    const bizContent = {
+      external_user_id: externalUserId,
+      product_code: 'CYCLE_PAY_AUTH',
+      sign_scene: 'INDUSTRY',
+      subject: subject || '预授权代扣',
+      industry: industry || 'DEFAULT'
+    }
+    if (amount) {
+      bizContent.amount = amount
+    }
+    const response = await alipaySdk.exec('alipay.user.agreement.sign', { bizContent })
+    console.log('[Agreement Sign] Response:', JSON.stringify(response))
+    if (response && response.code === '10000') {
+      const agreementNo = response.agreement_no || response.agreementNo
+      agreements.set(externalUserId, {
+        agreementNo,
+        externalUserId,
+        signTime: new Date().toISOString(),
+        status: 'pending'
+      })
+      res.json({
+        success: true,
+        signUrl: response.sign_url || response.signUrl,
+        agreementNo,
+        externalUserId
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '签约失败',
+        code: response ? response.code : undefined
+      })
+    }
+  } catch (error) {
+    console.error('[Agreement Sign] Error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/agreement/query', async (req, res) => {
+  try {
+    const { externalUserId } = req.body
+    if (!externalUserId) {
+      return res.status(400).json({ error: 'Missing externalUserId' })
+    }
+    const stored = agreements.get(externalUserId)
+    if (!stored) {
+      return res.json({ hasAgreement: false })
+    }
+    res.json({
+      hasAgreement: true,
+      agreementInfo: {
+        agreementNo: stored.agreementNo,
+        alipayUserId: stored.externalUserId,
+        status: stored.status || 'active',
+        signTime: stored.signTime,
+        externalUserId: stored.externalUserId
+      }
+    })
+  } catch (error) {
+    console.error('[Agreement Query] Error:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/agreement/deduct', async (req, res) => {
+  try {
+    if (!requireSdk(res)) return
+    const { agreementNo, amount, subject, outTradeNo } = req.body
+    if (!agreementNo || !amount) {
+      return res.status(400).json({ error: 'Missing agreementNo or amount' })
+    }
+    const tradeNo = outTradeNo || 'DEDUCT_' + Date.now()
+    const bizContent = {
+      out_trade_no: tradeNo,
+      total_amount: parseFloat(amount).toFixed(2),
+      subject: subject || '预授权代扣',
+      product_code: 'CYCLE_PAY_AUTH',
+      agreement_params: {
+        agreement_no: agreementNo
+      }
+    }
+    const response = await alipaySdk.exec('alipay.trade.pay', { bizContent })
+    console.log('[Deduct] Response:', JSON.stringify(response))
+    if (response && response.code === '10000') {
+      res.json({
+        success: true,
+        tradeNo: response.trade_no || response.tradeNo,
+        outTradeNo: tradeNo,
+        totalAmount: response.total_amount || response.totalAmount,
+        status: response.trade_status || response.tradeStatus
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '代扣失败',
+        code: response ? response.code : undefined
+      })
+    }
+  } catch (error) {
+    console.error('[Deduct] Error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/agreement/notify', async (req, res) => {
+  try {
+    const params = req.body
+    console.log('[Agreement Notify] Received:', JSON.stringify(params))
+    if (!params.sign) {
+      return res.json('success')
+    }
+    if (!requireSdk(res)) {
+      return res.json('failure')
+    }
+    const signVerified = alipaySdk.checkNotifySign(params)
+    if (!signVerified) {
+      console.error('[Agreement Notify] Sign verification failed')
+      return res.json('failure')
+    }
+    const agreementNo = params.agreement_no
+    const externalUserId = params.external_user_id
+    const status = params.status
+    let sessionId = null
+    try {
+      if (params.ext_params) {
+        const extParams = typeof params.ext_params === 'string' ? JSON.parse(params.ext_params) : params.ext_params
+        sessionId = extParams.sessionId
+      }
+    } catch (e) {
+      sessionId = params.session_id || null
+    }
+
+    if (status === 'SIGNED' || status === 'ACTIVATED') {
+      console.log('[Agreement Notify] Agreement signed, auto-deduct...', { agreementNo, externalUserId, sessionId })
+      if (externalUserId) {
+        agreements.set(externalUserId, {
+          agreementNo,
+          externalUserId,
+          signTime: new Date().toISOString(),
+          status: 'active'
+        })
+      }
+      if (sessionId && sessions.has(sessionId)) {
+        const session = sessions.get(sessionId)
+        const signee = session.signees.find(s => s.externalUserId === externalUserId)
+        if (signee) {
+          signee.agreementNo = agreementNo
+          signee.status = 'active'
+        }
+        try {
+          const deductBizContent = {
+            out_trade_no: 'DEDUCT_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            total_amount: session.amount,
+            subject: session.subject,
+            product_code: 'CYCLE_PAY_AUTH',
+            agreement_params: {
+              agreement_no: agreementNo
+            }
+          }
+          console.log('[Auto Deduct] bizContent:', JSON.stringify(deductBizContent))
+          const deductResp = await alipaySdk.exec('alipay.trade.pay', { bizContent: deductBizContent })
+          console.log('[Auto Deduct] Response:', JSON.stringify(deductResp))
+          if (signee) {
+            if (deductResp && deductResp.code === '10000') {
+              signee.deductStatus = 'success'
+              signee.deductTradeNo = deductResp.trade_no || deductResp.tradeNo
+              signee.deductAmount = session.amount
+              signee.deductTime = new Date().toISOString()
+            } else {
+              signee.deductStatus = 'failed'
+              signee.deductError = (deductResp && (deductResp.subMsg || deductResp.msg)) || '代扣失败'
+            }
+          }
+        } catch (deductErr) {
+          console.error('[Auto Deduct] Error:', deductErr)
+          if (signee) {
+            signee.deductStatus = 'failed'
+            signee.deductError = deductErr.message
+          }
+        }
+      }
+    }
+    res.json('success')
+  } catch (error) {
+    console.error('[Agreement Notify] Error:', error)
+    res.json('failure')
+  }
+})
+
+app.post('/api/payment/create', async (req, res) => {
+  try {
+    if (!requireSdk(res)) return
+    const { orderNo, amount, subject, buyerOpenId } = req.body
+    if (!orderNo || !amount) {
+      return res.status(400).json({ error: 'Missing orderNo or amount' })
+    }
+    const totalAmount = parseFloat(amount).toFixed(2)
+    const bizContent = {
+      out_trade_no: orderNo,
+      total_amount: totalAmount,
+      subject: subject || '商品购买',
+      product_code: 'JSAPI_PAY',
+      timeout_express: '30m',
+      notify_url: BASE_URL + '/api/payment/notify'
+    }
+    if (buyerOpenId) {
+      bizContent.buyer_open_id = buyerOpenId
+    }
+    const response = await alipaySdk.exec('alipay.trade.create', { bizContent })
+    console.log('[Payment Create] Response:', JSON.stringify(response))
+    if (response && response.code === '10000') {
+      const tradeNo = response.trade_no || response.tradeNo || ''
+      orders.set(orderNo, {
+        tradeNo,
+        amount: totalAmount,
+        subject: bizContent.subject,
+        status: 'WAIT_BUYER_PAY',
+        createdAt: new Date().toISOString()
+      })
+      res.json({ success: true, tradeNo, orderNo, amount: totalAmount })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '创建交易失败',
+        code: response ? response.code : undefined
+      })
+    }
+  } catch (error) {
+    console.error('[Payment Create] Error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/payment/notify', (req, res) => {
+  try {
+    const params = req.body
+    if (!params.sign) {
+      return res.json('success')
+    }
+    if (!requireSdk(res)) {
+      return res.json('failure')
+    }
+    const signVerified = alipaySdk.checkNotifySign(params)
+    if (!signVerified) {
+      console.error('[Payment Notify] Sign verification failed')
+      return res.json('failure')
+    }
+    const orderNo = params.out_trade_no
+    const tradeStatus = params.trade_status
+    const tradeNo = params.trade_no
+    const order = orders.get(orderNo)
+    if (!order) {
+      console.error('[Payment Notify] Order not found:', orderNo)
+      return res.json('failure')
+    }
+    order.status = tradeStatus
+    order.tradeNo = tradeNo
+    order.paidAt = new Date().toISOString()
+    console.log('[Payment Notify] Processed:', { orderNo, tradeStatus, tradeNo })
+    res.json('success')
+  } catch (error) {
+    console.error('[Payment Notify] Error:', error)
+    res.json('failure')
+  }
+})
+
+app.post('/api/payment/query', async (req, res) => {
+  try {
+    const { orderNo } = req.body
+    if (!orderNo) {
+      return res.status(400).json({ error: 'Missing orderNo' })
+    }
+    const response = await alipaySdk.exec('alipay.trade.query', {
+      bizContent: { out_trade_no: orderNo }
+    })
+    console.log('[Payment Query] Response:', JSON.stringify(response))
+    if (response && response.code === '10000') {
+      res.json({
+        success: true,
+        status: response.tradeStatus,
+        tradeNo: response.tradeNo,
+        totalAmount: response.totalAmount,
+        buyerLogonId: response.buyerLogonId
+      })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '查询失败'
+      })
+    }
+  } catch (error) {
+    console.error('[Payment Query] Error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+app.post('/api/payment/refund', async (req, res) => {
+  try {
+    if (!requireSdk(res)) return
+    const { orderNo, refundAmount, refundReason } = req.body
+    if (!orderNo || !refundAmount) {
+      return res.status(400).json({ error: 'Missing orderNo or refundAmount' })
+    }
+    const order = orders.get(orderNo)
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' })
+    }
+    const refundNo = 'REFUND_' + Date.now()
+    const response = await alipaySdk.exec('alipay.trade.refund', {
+      bizContent: {
+        out_trade_no: orderNo,
+        refund_amount: parseFloat(refundAmount).toFixed(2),
+        refund_reason: refundReason || '用户申请退款',
+        out_request_no: refundNo
+      }
+    })
+    console.log('[Payment Refund] Response:', JSON.stringify(response))
+    if (response && response.code === '10000') {
+      res.json({ success: true, refundId: response.refundId, refundNo })
+    } else {
+      res.status(500).json({
+        success: false,
+        error: (response && (response.subMsg || response.msg)) || '退款失败'
+      })
+    }
+  } catch (error) {
+    console.error('[Payment Refund] Error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 app.get('/api/order/records', (req, res) => {
   try {
     const records = []
@@ -770,40 +693,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('')
   console.log('========================================')
   console.log('  Alipay Mall Backend Started')
-  console.log('  HTTP Port: ' + PORT)
-  console.log('  Local: http://localhost:' + PORT)
-  console.log('  Network: http://' + HOST_IP + ':' + PORT)
-  console.log('========================================')
-  console.log('')
-  console.log('  API Endpoints:')
-  console.log('  POST /api/alipay/auth                          - OAuth token exchange')
-  console.log('  POST /api/alipay/create                        - Create JSAPI trade')
-  console.log('  POST /api/alipay/notify                        - Payment callback')
-  console.log('  GET  /api/order/:orderNo                       - Query local order')
-  console.log('  POST /api/alipay/query                         - Query alipay order')
-  console.log('  POST /api/alipay/refund                        - Apply refund')
-  console.log('  POST /api/alipay/agreement/sign                - Sign agreement')
-  console.log('  POST /api/alipay/agreement/query               - Query agreement')
-  console.log('  POST /api/alipay/agreement/deduct              - Manual deduct')
-  console.log('  POST /api/alipay/agreement/notify             - Agreement callback (auto-deduct)')
-  console.log('  POST /api/alipay/agreement/session/create      - Create sign session')
-  console.log('  GET  /api/alipay/agreement/scan                - Scan sign page')
-  console.log('  GET  /api/alipay/agreement/session/:id/signees - Query signees')
-  console.log('  GET  /api/order/records                        - All order records')
-  console.log('  GET  /api/health                               - Health check')
-  console.log('')
+  console.log('  Port: ' + PORT)
+  console.log('  Health: http://localhost:' + PORT + '/api/health')
+  console.log('  Diagnose: http://localhost:' + PORT + '/api/diagnose')
   console.log('========================================')
   console.log('')
 })
-
-if (certOptions.key && certOptions.cert) {
-  const HTTPS_PORT = 3001
-  https.createServer(certOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log('  HTTPS Port: ' + HTTPS_PORT + ' (self-signed cert)')
-    console.log('  Network: https://' + HOST_IP + ':' + HTTPS_PORT)
-    console.log('  Mobile trust first: https://' + HOST_IP + ':' + HTTPS_PORT + '/api/health')
-    console.log('')
-    console.log('========================================')
-    console.log('')
-  })
-}
