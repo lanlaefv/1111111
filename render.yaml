@@ -4,8 +4,17 @@ services:
     env: node
     plan: free
     region: singapore
+    rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: PORT
         value: "10000"
+      - key: ALIPAY_APP_ID
+        value: ""
+      - key: ALIPAY_PRIVATE_KEY
+        value: ""
+      - key: ALIPAY_PUBLIC_KEY
+        value: ""
+      - key: BASE_URL
+        value: "https://alipay-mall-backend.onrender.com"
